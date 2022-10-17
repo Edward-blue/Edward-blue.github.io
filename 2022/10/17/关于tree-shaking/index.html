@@ -91,7 +91,6 @@
 <li><p><code>default</code> 导出转换为 <code>HarmonyExportExpressionDependency</code> 对象</p>
 </li>
 </ul>
-<p>  <img src="/_v_images/20221017153547159_10488.image" alt="企业微信截图_16369664146252.png"></p>
 <p>  <code>FlagDependencyExportsPlugin</code> 插件的转换处理流程：</p>
 <ol>
 <li>所有模块都编译完毕后，触发 <code>compilation.hooks.finishModules</code> 钩子，开始执行 <code>FlagDependencyExportsPlugin</code> 插件回调</li>
@@ -129,16 +128,13 @@
 <h3 id="三-tree-shaking-实践"><a href="#三-tree-shaking-实践" class="headerlink" title="三. tree-shaking 实践"></a>三. tree-shaking 实践</h3><ul>
 <li>development 模式下开启 tree-shaking</li>
 </ul>
-<p><img src="/_v_images/20221017153546931_12956.image" alt="企业微信截图_16369636453064.png"></p>
 <p>由 <strong>optimization.usedExports</strong> 收集未使用的导出内容的信息，并将其标记。</p>
 <p>由 <strong>optimization.sideEffects</strong> 告知 webpack 去辨识 <strong>package.json</strong> 中的 <code>[副作用](&lt;https://github.com/webpack/webpack/blob/master/examples/side-effects/README.md&gt;)</code> 标记或规则，以跳过那些当导出不被使用且被标记不包含副作用的模块。</p>
 <p>presets: [[“es2015”, { modules: false }]] 来设置导出模块为 es6 Moudle。</p>
 <p>使用 uglifyjs-webpack-plugin 清楚标记的无用代码。</p>
-<p><img src="/_v_images/20221017153546723_22197.image" alt="企业微信截图_16369630187057.png"></p>
 <ul>
 <li>production 模式下开启 tree-shaking</li>
 </ul>
-<p><img src="/_v_images/20221017153546511_8884.image" alt="企业微信截图_1636963213687.png"></p>
 <p>在 development 模式下，为了开发和调试方便，我们是不会开启压缩的，而 production 下，会自动为我们开启 tree-shaking。去掉 usedExports 和 uglifyjs-webpack-plugin 相关配置，将 mode 修改为 production。</p>
 <h3 id="四-无效的-tree-shaking"><a href="#四-无效的-tree-shaking" class="headerlink" title="四. 无效的 tree-shaking"></a>四. 无效的 tree-shaking</h3><ul>
 <li><p>UglifyJS不能消除未引用的类，uglify不进行程序流分析，所以不能排除有可能有副作用的代码</p>
