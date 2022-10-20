@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-siteapp">
     <title>
         
-            归档
+            关于axios
         
     </title>
     <link rel="shortcut icon" href="#"/>
@@ -31,15 +31,28 @@
 <meta name="generator" content="Hexo 6.0.0"></head>
 <body>
     <a id="cover"></a>
-    <link type="text/css" rel="stylesheet" href="/css/archive.css">
+    <link type="text/css" rel="stylesheet" href="/css/post.css">
 <div id="header" class="header">
     <div class="vertical">
         <div class="inner">
             
-                <h1 class="header-subtitle">归档</h1>
+                <h1 class="header-subtitle">关于axios</h1>
                 <div class="header-subinfo">
-                    <p class="article-info-text Chinese"></p>
-                    <p class="article-info-text English"></p>                  
+                    <p class="article-info-text">
+                        <span>
+                            <i class="iconfont icon-time"></i> 发表时间：2022-10-20
+                        </span>
+                        
+                            <span id="/2022/10/20/关于axios/" class="leancloud_visitors" data-flag-title="关于axios">
+                                <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
+                            </span>
+                        
+                        <span>
+                            <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/2022/10/20/关于axios/"></span>
+                        </span>  
+                    </p>
+                    
+                    
                 </div>
             
         </div>
@@ -48,57 +61,70 @@
 </div>
 <div id="container">
     
-        
-            <!-- 归档页面、分类归档页面、标签归档页面 -->
-            <div class="articles">
-                <div class="articles-wrap">
-                    <span class="archive-move-on"></span>
-                    <span class="archive-counter">
-                        
-                            目前共计 3 篇日志，继续加油！
-                        
-                    </span>
+        <!-- 文章页面 -->
+        <div id="article">
+            <div class="toc"></div>
+            <div class="article-body">
+                <h1 id="关于axios"><a href="#关于axios" class="headerlink" title="关于axios"></a>关于axios</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Axios 相信对前端工程熟悉的铁汁对它不会感到陌生了，这简直就是前端近年来的一大杀器。它是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中。</p>
+<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><ul>
+<li>从浏览器中创建 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequests</a></li>
+<li>从 node.js 创建 <a target="_blank" rel="noopener" href="http://nodejs.org/api/http.html">http</a> 请求</li>
+<li>支持 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> API</li>
+<li>拦截请求和响应</li>
+<li>转换请求数据和响应数据</li>
+<li>取消请求</li>
+<li>自动转换 JSON 数据</li>
+<li>客户端支持防御 <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">XSRF</a><br>接下来我们就话不多说了，直接开始今天的主题，虽然axios很强，但是单纯的axios并不能满足我们日常的使用，因此很多时候我们都需要对axios进行二次封装，axios又是基于XMLHttpRequests的封装。套娃？yes<h2 id="为啥要封装axios"><a href="#为啥要封装axios" class="headerlink" title="为啥要封装axios"></a>为啥要封装axios</h2>随着项目规模的增大，每次发送请求，都需要设置超时时间、设置请求头、状态码的拦截、token是否携带、根据项目环境判断使用哪个请求，错误处理等等，重复的劳动浪费时间，还会让代码变得冗余，难以维护。那我们要做的有哪些呢？</li>
+<li>POST请求参数序列化</li>
+<li>取消重复请求</li>
+<li>Loading</li>
+<li>判断不同HTTP状态码</li>
+<li>请求自动携带token</li>
+<li>限制同时请求数<br>废话不多说直接上代码 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br></pre></td><td class="code"><pre><span class="line"> let appId = &quot;sdjhb-jdhoo-f265-djbhfj-iui&quot;   //应用识别码，会在每一个url地址上拼接这个属性</span><br><span class="line"></span><br><span class="line">let stayTime = 3000 //设置zarmUI库Toast（轻提示）组件的停留时间</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 设置超时时间和跨域是否允许携带凭证</span><br><span class="line"> */</span><br><span class="line">axios.defaults.timeout = 10000; //10秒</span><br><span class="line">axios.defaults.withCredentials = true;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 设置post请求头</span><br><span class="line"> * application/json;charset=UTF-8   JSON格式</span><br><span class="line"> * application/x-www-form-urlencoded;charset=UTF-8  Form表单格式</span><br><span class="line"> */</span><br><span class="line">axios.defaults.headers[&#x27;Content-Type&#x27;] = &#x27;application/json;charset=UTF-8&#x27;;</span><br><span class="line"></span><br><span class="line">var CancelToken = axios.CancelToken;</span><br><span class="line">let sources = []  // 定义数组用于存储每个ajax请求的取消函数及对应标识</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 请求防抖当一个url地址被请求多次就会取消前一次请求</span><br><span class="line"> */</span><br><span class="line">let removeSource = (config) =&gt; &#123;</span><br><span class="line">    for (let source in sources) &#123;</span><br><span class="line">        // 当多次请求相同时，取消之前的请求</span><br><span class="line">        if (sources[source].umet === config.url + &#x27;&amp;&#x27; + config.method) &#123;</span><br><span class="line">            sources[source].cancel(&quot;取消请求&quot;)</span><br><span class="line">            sources.splice(source, 1)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 请求拦截器</span><br><span class="line"> */</span><br><span class="line">axios.interceptors.request.use(config =&gt; &#123;</span><br><span class="line">    removeSource(config)</span><br><span class="line">    config.cancelToken = new CancelToken((c) =&gt; &#123;</span><br><span class="line">        // 将取消函数存起来</span><br><span class="line">        sources.push(&#123; umet: config.url + &#x27;&amp;&#x27; + config.method, cancel: c &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    return config;</span><br><span class="line">&#125;, error =&gt; &#123;</span><br><span class="line">    return Promise.reject(error)</span><br><span class="line">&#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// 响应拦截器</span><br><span class="line">axios.interceptors.response.use(config =&gt; &#123;</span><br><span class="line">    if (config.data.statusCode &gt;= 3000) &#123;</span><br><span class="line">        Toast.show(&#123; content: config.data.msg, stayTime &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    removeSource(config.config)</span><br><span class="line"></span><br><span class="line">    return config.data;</span><br><span class="line">&#125;, error =&gt; &#123;</span><br><span class="line">    if (!error.response) return</span><br><span class="line">    switch (error.response.status) &#123;</span><br><span class="line">        // 401: 未登录</span><br><span class="line">        // 未登录则跳转登录页面，并携带当前页面的路径</span><br><span class="line">        // 在登录成功后返回当前页面，这一步需要在登录页操作。                </span><br><span class="line">        case 401:</span><br><span class="line">            if (window.location.hostname === &quot;localhost&quot;) &#123;</span><br><span class="line">                axios.post(&quot;/api/v1/login?client_name=form&quot;, &#123;</span><br><span class="line">                    &quot;userName&quot;: &quot;lixiaoyao4_vendor&quot;,</span><br><span class="line">                    &quot;password&quot;: 123456</span><br><span class="line">                &#125;)</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                window.location = error.response.headers.locationurl;</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        // 403 token过期</span><br><span class="line">        // 登录过期对用户进行提示</span><br><span class="line">        // 清除本地token和清空vuex中token对象</span><br><span class="line">        // 跳转登录页面                </span><br><span class="line">        case 403:</span><br><span class="line">            Toast.show(&#123; content: &quot;登录过期，请重新登录&quot;, stayTime &#125;)</span><br><span class="line">            // 跳转登录页面，并将要浏览的页面fullPath传过去，登录成功后跳转需要访问的页面 </span><br><span class="line">            if (window.location.hostname === &quot;localhost&quot;) &#123;</span><br><span class="line">                axios.post(&quot;/api/v1/login?client_name=form&quot;, &#123;</span><br><span class="line">                    &quot;userName&quot;: &quot;lixiaoyao4_vendor&quot;,</span><br><span class="line">                    &quot;password&quot;: 123456</span><br><span class="line">                &#125;)</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                window.location = error.response.headers.locationurl;</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        // 404请求不存在</span><br><span class="line">        case 404:</span><br><span class="line">            Toast.show(&#123; content: &quot;访问资源不存在&quot;, stayTime &#125;)</span><br><span class="line">            break;</span><br><span class="line">        // 其他错误，直接抛出错误提示</span><br><span class="line">        default:</span><br><span class="line">            Toast.show(&#123; content: error.response.data.message, stayTime &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    return Promise.reject(error.response)</span><br><span class="line">&#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * get方法，对应get请求</span><br><span class="line"> * @param &#123;String&#125; url [请求的url地址]</span><br><span class="line"> * @param &#123;Object&#125; params [请求时携带的参数]</span><br><span class="line"> */</span><br><span class="line">function get(url, params) &#123;</span><br><span class="line">    return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">        axios.get(url, &#123;</span><br><span class="line">            params: &#123;</span><br><span class="line">                ...params,</span><br><span class="line">                appId</span><br><span class="line">            &#125;,</span><br><span class="line">        &#125;).then(res =&gt; &#123;</span><br><span class="line">            resolve(res);</span><br><span class="line">        &#125;).catch(err =&gt; &#123;</span><br><span class="line">            reject(err.data)</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * post方法，对应post请求</span><br><span class="line"> * @param &#123;String&#125; url [请求的url地址]</span><br><span class="line"> * @param &#123;Object&#125; params [请求时携带的参数]</span><br><span class="line"> */</span><br><span class="line">function post(url, params) &#123;</span><br><span class="line">    if (url.indexOf(&quot;?&quot;) === -1) &#123;</span><br><span class="line">        url += `?appId=$&#123;appId&#125;`</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        url += `&amp;appId=$&#123;appId&#125;`</span><br><span class="line">    &#125;</span><br><span class="line">    return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">        axios.post(`$&#123;url&#125;`, params)</span><br><span class="line">            .then(res =&gt; &#123;</span><br><span class="line">                resolve(res);</span><br><span class="line">            &#125;)</span><br><span class="line">            .catch(err =&gt; &#123;</span><br><span class="line">                reject(err)</span><br><span class="line">            &#125;)</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 对外暴露</span><br><span class="line">export &#123; post, get &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+                
+                <p class="end">__END__</p>
+            </div>
+            <div class="article-footer">
+                <div class="suffix-box">
+    <div class="suffix-box-left">
+        <img src="/image/sidebar/avatar.jpg" alt="edward">
+    </div>
+    <div class="suffix-box-right">
+        <span class="suffix-box-title">文章作者：</span>edward
+        <br>
+        <span class="suffix-box-title">文章出处：</span><a href="/2022/10/20/%E5%85%B3%E4%BA%8Eaxios/" target="_blank">关于axios</a>
+        <br>
+        <span class="suffix-box-title">作者签名：</span>迷途漫漫终有一归
+        <br>
+        <span class="suffix-box-title">关于主题：</span><a href="https://github.com/first19326/Hexo-LiveForCode" target="_blank">Hexo - Live For Code</a>
+        <br>
+        <span class="suffix-box-title">版权声明：</span>文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="BY-NC-SA" target="_blank">BY-NC-SA</a> 许可协议，转载请注明出处
+        <br>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+                
+                
+                <div class="article-prev-next">
                     
                     
-                        
-                            <div class="archive-title">
-                                <h2 class="archive-year">2022</h2>
-                            </div>
-                            
-                           
-                        <div class="article">
-                            <div class="article-header">
-                                <h1 class="article-title"><a href="/2022/10/20/%E5%85%B3%E4%BA%8Eaxios/"><span>关于axios</span></a></h1>
-                                <div class="article-meta">
-                                    <span class="article-time">10-20</span>
-                                </div>
-                            </div>
-                        </div>
-                    
-                           
-                        <div class="article">
-                            <div class="article-header">
-                                <h1 class="article-title"><a href="/2022/10/17/%E5%85%B3%E4%BA%8Etree-shaking/"><span>关于tree-shaking</span></a></h1>
-                                <div class="article-meta">
-                                    <span class="article-time">10-17</span>
-                                </div>
-                            </div>
-                        </div>
-                    
-                           
-                        <div class="article">
-                            <div class="article-header">
-                                <h1 class="article-title"><a href="/2022/09/22/%E5%85%B3%E4%BA%8Evue3%E6%88%91%E6%9C%89%E8%AF%9D%E6%83%B3%E8%AF%B4/"><span>关于vue3我有话想说</span></a></h1>
-                                <div class="article-meta">
-                                    <span class="article-time">09-22</span>
-                                </div>
-                            </div>
-                        </div>
+                        <a href="/2022/10/17/%E5%85%B3%E4%BA%8Etree-shaking/" class="next-prefix">» </a> 下一篇：    <a href="/2022/10/17/%E5%85%B3%E4%BA%8Etree-shaking/" title="发布于 2022-10-17 03:46">关于tree-shaking</a>
                     
                 </div>
             </div>
             
+    <div class="article-comments">
         
+            <div class="comments-title">
+                评论列表
+            </div>
+        
+        <div class="comments-content"></div>
+    </div>
+
+        </div>
     
 </div>
     <div id="footer"></div>
