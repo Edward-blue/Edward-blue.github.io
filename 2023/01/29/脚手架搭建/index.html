@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="referrer" content="origin">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>
+        
+            脚手架搭建
+        
+    </title>
+    <link rel="shortcut icon" href="#"/>
+
+    <link type="text/css" rel="stylesheet" href="/font/LongCang.css">
+    <link type="text/css" rel="stylesheet" href="/font/Monda.css">
+    <link type="text/css" rel="stylesheet" href="/font/NotoSansSC.css">
+    <link type="text/css" rel="stylesheet" href="/font/NotoSerifSC.css">
+    <link type="text/css" rel="stylesheet" href="/font/Playball.css">
+    <link type="text/css" rel="stylesheet" href="/font/PTMono.css">
+    <link type="text/css" rel="stylesheet" href="/font/Roboto.css">
+    <link type="text/css" rel="stylesheet" href="/font/RobotoSlab.css">
+    <link type="text/css" rel="stylesheet" href="/font/Rosario.css">
+    <link type="text/css" rel="stylesheet" href="/font/UbuntuMono.css">
+
+    <link type="text/css" rel="stylesheet" href="/css/base.css">
+    <link type="text/css" rel="stylesheet" href="/css/code.css">
+
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+<meta name="generator" content="Hexo 6.0.0"></head>
+<body>
+    <a id="cover"></a>
+    <link type="text/css" rel="stylesheet" href="/css/post.css">
+<div id="header" class="header">
+    <div class="vertical">
+        <div class="inner">
+            
+                <h1 class="header-subtitle">脚手架搭建</h1>
+                <div class="header-subinfo">
+                    <p class="article-info-text">
+                        <span>
+                            <i class="iconfont icon-time"></i> 发表时间：2023-01-29
+                        </span>
+                        
+                            <span id="/2023/01/29/脚手架搭建/" class="leancloud_visitors" data-flag-title="脚手架搭建">
+                                <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
+                            </span>
+                        
+                        <span>
+                            <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/2023/01/29/脚手架搭建/"></span>
+                        </span>  
+                    </p>
+                    
+                    
+                </div>
+            
+        </div>
+    </div>
+    
+</div>
+<div id="container">
+    
+        <!-- 文章页面 -->
+        <div id="article">
+            <div class="toc"></div>
+            <div class="article-body">
+                <p>最近在学习 <a target="_blank" rel="noopener" href="https://github.com/vuejs/vue-cli">vue-cli</a> 的源码，获益良多。为了让自己理解得更加深刻，我决定模仿它造一个轮子，争取尽可能多的实现原有的功能。<br>我将这个轮子分成三个版本：</p>
+<ol>
+<li>尽可能用最少的代码实现一个最简版本的脚手架。</li>
+<li>在 1 的基础上添加一些辅助功能，例如选择包管理器、npm 源等等。</li>
+<li>实现插件化，可以自由的进行扩展。在不影响内部源码的情况下，添加功能。</li>
+</ol>
+<p>有人可能不懂脚手架是什么。按我的理解，脚手架就是帮助你把项目的基础架子搭好。例如项目依赖、模板、构建工具等等。让你不用从零开始配置一个项目，尽可能快的进行业务开发。</p>
+<h2 id="第一个版本-v1"><a href="#第一个版本-v1" class="headerlink" title="第一个版本 v1"></a>第一个版本 v1</h2><p>第一个版本的功能比较简单，大致为：</p>
+<ol>
+<li>用户输入命令，准备创建项目。</li>
+<li>脚手架解析用户命令，并弹出交互语句，询问用户创建项目需要哪些功能。</li>
+<li>用户选择自己需要的功能。</li>
+<li>脚手架根据用户的选择创建 <code>package.json</code> 文件，并添加对应的依赖项。</li>
+<li>脚手架根据用户的选择渲染项目模板，生成文件（例如 <code>index.html</code>、<code>main.js</code>、<code>App.vue</code> 等文件）。</li>
+<li>执行 <code>npm install</code> 命令安装依赖。</li>
+</ol>
+<p>项目目录树：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">├─.vscode</span><br><span class="line">├─bin </span><br><span class="line">│  ├─mvc.js # mvc 全局命令</span><br><span class="line">├─lib</span><br><span class="line">│  ├─generator # 各个功能的模板</span><br><span class="line">│  │  ├─babel # babel 模板</span><br><span class="line">│  │  ├─linter # eslint 模板</span><br><span class="line">│  │  ├─router # vue-router 模板</span><br><span class="line">│  │  ├─vue # vue 模板</span><br><span class="line">│  │  ├─vuex # vuex 模板</span><br><span class="line">│  │  └─webpack # webpack 模板</span><br><span class="line">│  ├─promptModules # 各个模块的交互提示语</span><br><span class="line">│  └─utils # 一系列工具函数</span><br><span class="line">│  ├─create.js # create 命令处理函数</span><br><span class="line">│  ├─Creator.js # 处理交互提示</span><br><span class="line">│  ├─Generator.js # 渲染模板</span><br><span class="line">│  ├─PromptModuleAPI.js # 将各个功能的提示语注入 Creator</span><br><span class="line">└─scripts # commit message 验证脚本 和项目无关 不需关注</span><br></pre></td></tr></table></figure>
+
+<h3 id="处理用户命令"><a href="#处理用户命令" class="headerlink" title="处理用户命令"></a>处理用户命令</h3><p>脚手架第一个功能就是处理用户的命令，这需要使用 <a target="_blank" rel="noopener" href="https://github.com/tj/commander.js/blob/master/Readme_zh-CN.md">commander.js</a>。这个库的功能就是解析用户的命令，提取出用户的输入交给脚手架。例如这段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env node</span></span><br><span class="line"><span class="keyword">const</span> program = <span class="built_in">require</span>(<span class="string">&#x27;commander&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> create = <span class="built_in">require</span>(<span class="string">&#x27;../lib/create&#x27;</span>)</span><br><span class="line"></span><br><span class="line">program</span><br><span class="line">.<span class="title function_">version</span>(<span class="string">&#x27;0.1.0&#x27;</span>)</span><br><span class="line">.<span class="title function_">command</span>(<span class="string">&#x27;create &lt;name&gt;&#x27;</span>)</span><br><span class="line">.<span class="title function_">description</span>(<span class="string">&#x27;create a new project&#x27;</span>)</span><br><span class="line">.<span class="title function_">action</span>(<span class="function"><span class="params">name</span> =&gt;</span> &#123; </span><br><span class="line">    <span class="title function_">create</span>(name)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">program.<span class="title function_">parse</span>()</span><br></pre></td></tr></table></figure>
+
+<p>它使用 commander 注册了一个 <code>create</code> 命令，并设置了脚手架的版本和描述。我将这段代码保存在项目下的 <code>bin</code> 目录，并命名为 <code>mvc.js</code>。然后在 <code>package.json</code> 文件添加这段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;bin&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;mvc&quot;</span>: <span class="string">&quot;./bin/mvc.js&quot;</span></span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<p>再执行 <a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v7/commands/npm-link">npm link</a>，就可以将 <code>mvc</code> 注册成全局命令。这样在电脑上的任何地方都能使用 <code>mvc</code> 命令了。实际上，就是用 <code>mvc</code> 命令来代替执行 <code>node ./bin/mvc.js</code>。</p>
+<p>假设用户在命令行上输入 <code>mvc create demo</code>（实际上执行的是 <code>node ./bin/mvc.js create demo</code>），<code>commander</code> 解析到命令 <code>create</code> 和参数 <code>demo</code>。然后脚手架可以在 <code>action</code> 回调里取到参数 <code>name</code>（值为 demo）。</p>
+<h3 id="和用户交互"><a href="#和用户交互" class="headerlink" title="和用户交互"></a>和用户交互</h3><p>取到用户要创建的项目名称 <code>demo</code> 之后，就可以弹出交互选项，询问用户要创建的项目需要哪些功能。这需要用到<a target="_blank" rel="noopener" href="https://github.com/SBoudrias/Inquirer.js/"><br>Inquirer.js</a>。<code>Inquirer.js</code> 的功能就是弹出一个问题和一些选项，让用户选择。并且选项可以指定是多选、单选等等。</p>
+<p>例如下面的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> prompts = [</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: <span class="string">&quot;features&quot;</span>, <span class="comment">// 选项名称</span></span><br><span class="line">        <span class="string">&quot;message&quot;</span>: <span class="string">&quot;Check the features needed for your project:&quot;</span>, <span class="comment">// 选项提示语</span></span><br><span class="line">        <span class="string">&quot;pageSize&quot;</span>: <span class="number">10</span>,</span><br><span class="line">        <span class="string">&quot;type&quot;</span>: <span class="string">&quot;checkbox&quot;</span>, <span class="comment">// 选项类型 另外还有 confirm list 等</span></span><br><span class="line">        <span class="string">&quot;choices&quot;</span>: [ <span class="comment">// 具体的选项</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Babel&quot;</span>,</span><br><span class="line">                <span class="string">&quot;value&quot;</span>: <span class="string">&quot;babel&quot;</span>,</span><br><span class="line">                <span class="string">&quot;short&quot;</span>: <span class="string">&quot;Babel&quot;</span>,</span><br><span class="line">                <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Transpile modern JavaScript to older versions (for compatibility)&quot;</span>,</span><br><span class="line">                <span class="string">&quot;link&quot;</span>: <span class="string">&quot;https://babeljs.io/&quot;</span>,</span><br><span class="line">                <span class="string">&quot;checked&quot;</span>: <span class="literal">true</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Router&quot;</span>,</span><br><span class="line">                <span class="string">&quot;value&quot;</span>: <span class="string">&quot;router&quot;</span>,</span><br><span class="line">                <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Structure the app with dynamic pages&quot;</span>,</span><br><span class="line">                <span class="string">&quot;link&quot;</span>: <span class="string">&quot;https://router.vuejs.org/&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">inquirer.<span class="title function_">prompt</span>(prompts)</span><br></pre></td></tr></table></figure>
+
+<p>弹出的问题和选项如下：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/7326a4fc725e03e80df8150214c0d801e15b1c9287d2eb6bc3741bff6d1472a8/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f34623536353565663339396362333631323530323337326465376530366132642e706e67"><img src="/_v_images/20230116145033223_30192"></a></p>
+<p>问题的类型 <code>&quot;type&quot;: &quot;checkbox&quot;</code> 是 <code>checkbox</code> 说明是多选。如果两个选项都进行选中的话，返回来的值为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">features</span>: [<span class="string">&#x27;babel&#x27;</span>, <span class="string">&#x27;router&#x27;</span>] &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>features</code> 是上面问题中的 <code>name</code> 属性。<code>features</code> 数组中的值则是每个选项中的 <code>value</code>。</p>
+<p><code>Inquirer.js</code> 还可以提供具有相关性的问题，也就是上一个问题选择了指定的选项，下一个问题才会显示出来。例如下面的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;Router&#x27;</span>,</span><br><span class="line">    <span class="attr">value</span>: <span class="string">&#x27;router&#x27;</span>,</span><br><span class="line">    <span class="attr">description</span>: <span class="string">&#x27;Structure the app with dynamic pages&#x27;</span>,</span><br><span class="line">    <span class="attr">link</span>: <span class="string">&#x27;https://router.vuejs.org/&#x27;</span>,</span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;historyMode&#x27;</span>,</span><br><span class="line">    <span class="attr">when</span>: <span class="function"><span class="params">answers</span> =&gt;</span> answers.<span class="property">features</span>.<span class="title function_">includes</span>(<span class="string">&#x27;router&#x27;</span>),</span><br><span class="line">    <span class="attr">type</span>: <span class="string">&#x27;confirm&#x27;</span>,</span><br><span class="line">    <span class="attr">message</span>: <span class="string">`Use history mode for router? <span class="subst">$&#123;chalk.yellow(<span class="string">`(Requires proper server setup for index fallback in production)`</span>)&#125;</span>`</span>,</span><br><span class="line">    <span class="attr">description</span>: <span class="string">`By using the HTML5 History API, the URLs don&#x27;t need the &#x27;#&#x27; character anymore.`</span>,</span><br><span class="line">    <span class="attr">link</span>: <span class="string">&#x27;https://router.vuejs.org/guide/essentials/history-mode.html&#x27;</span>,</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<p>第二个问题中有一个属性 <code>when</code>，它的值是一个函数 <code>answers =&gt; answers.features.includes(&#39;router&#39;)</code>。当函数的执行结果为 <code>true</code>，第二个问题才会显示出来。如果你在上一个问题中选择了 <code>router</code>，它的结果就会变为 <code>true</code>。弹出第二个问题：问你路由模式是否选择 <code>history</code> 模式。</p>
+<p>大致了解 <code>Inquirer.js</code> 后，就可以明白这一步我们要做什么了。主要就是将脚手架支持的功能配合对应的问题、可选值在控制台上展示出来，供用户选择。获取到用户具体的选项值后，再渲染模板和依赖。</p>
+<h4 id="有哪些功能"><a href="#有哪些功能" class="headerlink" title="有哪些功能"></a>有哪些功能</h4><p>先来看一下第一个版本支持哪些功能：</p>
+<ul>
+<li>vue</li>
+<li>vue-router</li>
+<li>vuex</li>
+<li>babel</li>
+<li>webpack</li>
+<li>linter(eslint)</li>
+</ul>
+<p>由于这是一个 vue 相关的脚手架，所以 vue 是默认提供的，不需要用户选择。另外构建工具 webpack 提供了开发环境和打包的功能，也是必需的，不用用户进行选择。所以可供用户选择的功能只有 4 个：</p>
+<ul>
+<li>vue-router</li>
+<li>vuex</li>
+<li>babel</li>
+<li>linter</li>
+</ul>
+<p>现在我们先来看一下这 4 个功能对应的交互提示语相关的文件。它们全部放在 <code>lib/promptModules</code> 目录下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-babel.<span class="property">js</span></span><br><span class="line">-linter.<span class="property">js</span></span><br><span class="line">-router.<span class="property">js</span></span><br><span class="line">-vuex.<span class="property">js</span></span><br></pre></td></tr></table></figure>
+
+<p>每个文件包含了和它相关的所有交互式问题。例如刚才的示例，说明 <code>router</code> 相关的问题有两个。下面再看一下 <code>babel.js</code> 的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="function">(<span class="params">api</span>) =&gt;</span> &#123;</span><br><span class="line">    api.<span class="title function_">injectFeature</span>(&#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;Babel&#x27;</span>,</span><br><span class="line">        <span class="attr">value</span>: <span class="string">&#x27;babel&#x27;</span>,</span><br><span class="line">        <span class="attr">short</span>: <span class="string">&#x27;Babel&#x27;</span>,</span><br><span class="line">        <span class="attr">description</span>: <span class="string">&#x27;Transpile modern JavaScript to older versions (for compatibility)&#x27;</span>,</span><br><span class="line">        <span class="attr">link</span>: <span class="string">&#x27;https://babeljs.io/&#x27;</span>,</span><br><span class="line">        <span class="attr">checked</span>: <span class="literal">true</span>,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只有一个问题，就是问下用户需不需要 <code>babel</code> 功能，默认为 <code>checked: true</code>，也就是需要。</p>
+<h4 id="注入问题"><a href="#注入问题" class="headerlink" title="注入问题"></a>注入问题</h4><p>用户使用 <code>create</code> 命令后，脚手架需要将所有功能的交互提示语句聚合在一起：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// craete.js</span></span><br><span class="line"><span class="keyword">const</span> creator = <span class="keyword">new</span> <span class="title class_">Creator</span>()</span><br><span class="line"><span class="comment">// 获取各个模块的交互提示语</span></span><br><span class="line"><span class="keyword">const</span> promptModules = <span class="title function_">getPromptModules</span>()</span><br><span class="line"><span class="keyword">const</span> promptAPI = <span class="keyword">new</span> <span class="title class_">PromptModuleAPI</span>(creator)</span><br><span class="line">promptModules.<span class="title function_">forEach</span>(<span class="function"><span class="params">m</span> =&gt;</span> <span class="title function_">m</span>(promptAPI))</span><br><span class="line"><span class="comment">// 清空控制台</span></span><br><span class="line"><span class="title function_">clearConsole</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 弹出交互提示语并获取用户的选择</span></span><br><span class="line"><span class="keyword">const</span> answers = <span class="keyword">await</span> inquirer.<span class="title function_">prompt</span>(creator.<span class="title function_">getFinalPrompts</span>())</span><br><span class="line">    </span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getPromptModules</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> [</span><br><span class="line">        <span class="string">&#x27;babel&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;router&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;vuex&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;linter&#x27;</span>,</span><br><span class="line">    ].<span class="title function_">map</span>(<span class="function"><span class="params">file</span> =&gt;</span> <span class="built_in">require</span>(<span class="string">`./promptModules/<span class="subst">$&#123;file&#125;</span>`</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Creator.js</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Creator</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">featurePrompt</span> = &#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;features&#x27;</span>,</span><br><span class="line">            <span class="attr">message</span>: <span class="string">&#x27;Check the features needed for your project:&#x27;</span>,</span><br><span class="line">            <span class="attr">pageSize</span>: <span class="number">10</span>,</span><br><span class="line">            <span class="attr">type</span>: <span class="string">&#x27;checkbox&#x27;</span>,</span><br><span class="line">            <span class="attr">choices</span>: [],</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">injectedPrompts</span> = []</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">getFinalPrompts</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">injectedPrompts</span>.<span class="title function_">forEach</span>(<span class="function"><span class="params">prompt</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> originalWhen = prompt.<span class="property">when</span> || (<span class="function">() =&gt;</span> <span class="literal">true</span>)</span><br><span class="line">            prompt.<span class="property">when</span> = <span class="function"><span class="params">answers</span> =&gt;</span> <span class="title function_">originalWhen</span>(answers)</span><br><span class="line">        &#125;)</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">const</span> prompts = [</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">featurePrompt</span>,</span><br><span class="line">            ...<span class="variable language_">this</span>.<span class="property">injectedPrompts</span>,</span><br><span class="line">        ]</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">return</span> prompts</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="title class_">Creator</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// PromptModuleAPI.js</span></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="keyword">class</span> <span class="title class_">PromptModuleAPI</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params">creator</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">creator</span> = creator</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">injectFeature</span>(<span class="params">feature</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">creator</span>.<span class="property">featurePrompt</span>.<span class="property">choices</span>.<span class="title function_">push</span>(feature)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">injectPrompt</span>(<span class="params">prompt</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">creator</span>.<span class="property">injectedPrompts</span>.<span class="title function_">push</span>(prompt)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上代码的逻辑如下：</p>
+<ol>
+<li>创建 <code>creator</code> 对象</li>
+<li>调用 <code>getPromptModules()</code> 获取所有功能的交互提示语</li>
+<li>再调用 <code>PromptModuleAPI</code> 将所有交互提示语注入到 <code>creator</code> 对象</li>
+<li>通过 <code>const answers = await inquirer.prompt(creator.getFinalPrompts())</code> 在控制台弹出交互语句，并将用户选择结果赋值给 <code>answers</code> 变量。</li>
+</ol>
+<p>如果所有功能都选上，<code>answers</code> 的值为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">features</span>: [ <span class="string">&#x27;vue&#x27;</span>, <span class="string">&#x27;webpack&#x27;</span>, <span class="string">&#x27;babel&#x27;</span>, <span class="string">&#x27;router&#x27;</span>, <span class="string">&#x27;vuex&#x27;</span>, <span class="string">&#x27;linter&#x27;</span> ], <span class="comment">// 项目具有的功能</span></span><br><span class="line">  <span class="attr">historyMode</span>: <span class="literal">true</span>, <span class="comment">// 路由是否使用 history 模式</span></span><br><span class="line">  <span class="attr">eslintConfig</span>: <span class="string">&#x27;airbnb&#x27;</span>, <span class="comment">// esilnt 校验代码的默认规则，可被覆盖</span></span><br><span class="line">  <span class="attr">lintOn</span>: [ <span class="string">&#x27;save&#x27;</span> ] <span class="comment">// 保存代码时进行校验</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="项目模板"><a href="#项目模板" class="headerlink" title="项目模板"></a>项目模板</h3><p>获取用户的选项后就该开始渲染模板和生成 <code>package.json</code> 文件了。先来看一下如何生成 <code>package.json</code> 文件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// package.json 文件内容</span></span><br><span class="line"><span class="keyword">const</span> pkg = &#123;</span><br><span class="line">    name,</span><br><span class="line">    <span class="attr">version</span>: <span class="string">&#x27;0.1.0&#x27;</span>,</span><br><span class="line">    <span class="attr">dependencies</span>: &#123;&#125;,</span><br><span class="line">    <span class="attr">devDependencies</span>: &#123;&#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先定义一个 <code>pkg</code> 变量来表示 <code>package.json</code> 文件，并设定一些默认值。</p>
+<p>所有的项目模板都放在 <code>lib/generator</code> 目录下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">├─lib</span><br><span class="line">│  ├─generator # 各个功能的模板</span><br><span class="line">│  │  ├─babel # babel 模板</span><br><span class="line">│  │  ├─linter # eslint 模板</span><br><span class="line">│  │  ├─router # vue-router 模板</span><br><span class="line">│  │  ├─vue # vue 模板</span><br><span class="line">│  │  ├─vuex # vuex 模板</span><br><span class="line">│  │  └─webpack # webpack 模板</span><br></pre></td></tr></table></figure>
+
+<p>每个模板的功能都差不多：</p>
+<ol>
+<li>向 <code>pkg</code> 变量注入依赖项</li>
+<li>提供模板文件</li>
+</ol>
+<h4 id="注入依赖"><a href="#注入依赖" class="headerlink" title="注入依赖"></a>注入依赖</h4><p>下面是 <code>babel</code> 相关的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="function">(<span class="params">generator</span>) =&gt;</span> &#123;</span><br><span class="line">    generator.<span class="title function_">extendPackage</span>(&#123;</span><br><span class="line">        <span class="attr">babel</span>: &#123;</span><br><span class="line">            <span class="attr">presets</span>: [<span class="string">&#x27;@babel/preset-env&#x27;</span>],</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">dependencies</span>: &#123;</span><br><span class="line">            <span class="string">&#x27;core-js&#x27;</span>: <span class="string">&#x27;^3.8.3&#x27;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">devDependencies</span>: &#123;</span><br><span class="line">            <span class="string">&#x27;@babel/core&#x27;</span>: <span class="string">&#x27;^7.12.13&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;@babel/preset-env&#x27;</span>: <span class="string">&#x27;^7.12.13&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;babel-loader&#x27;</span>: <span class="string">&#x27;^8.2.2&#x27;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，模板调用 <code>generator</code> 对象的 <code>extendPackage()</code> 方法向 <code>pkg</code> 变量注入了 <code>babel</code> 相关的所有依赖。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">extendPackage</span>(<span class="params">fields</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> pkg = <span class="variable language_">this</span>.<span class="property">pkg</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> fields) &#123;</span><br><span class="line">        <span class="keyword">const</span> value = fields[key]</span><br><span class="line">        <span class="keyword">const</span> existing = pkg[key]</span><br><span class="line">        <span class="keyword">if</span> (<span class="title function_">isObject</span>(value) &amp;&amp; (key === <span class="string">&#x27;dependencies&#x27;</span> || key === <span class="string">&#x27;devDependencies&#x27;</span> || key === <span class="string">&#x27;scripts&#x27;</span>)) &#123;</span><br><span class="line">            pkg[key] = <span class="title class_">Object</span>.<span class="title function_">assign</span>(existing || &#123;&#125;, value)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            pkg[key] = value</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注入依赖的过程就是遍历所有用户已选择的模板，并调用 <code>extendPackage()</code> 注入依赖。</p>
+<h4 id="渲染模板"><a href="#渲染模板" class="headerlink" title="渲染模板"></a>渲染模板</h4><p>脚手架是怎么渲染模板的呢？用 <code>vuex</code> 举例，先看一下它的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="function">(<span class="params">generator</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="comment">// 向入口文件 `src/main.js` 注入代码 import store from &#x27;./store&#x27;</span></span><br><span class="line">    generator.<span class="title function_">injectImports</span>(generator.<span class="property">entryFile</span>, <span class="string">`import store from &#x27;./store&#x27;`</span>)</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 向入口文件 `src/main.js` 的 new Vue() 注入选项 store</span></span><br><span class="line">    generator.<span class="title function_">injectRootOptions</span>(generator.<span class="property">entryFile</span>, <span class="string">`store`</span>)</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 注入依赖</span></span><br><span class="line">    generator.<span class="title function_">extendPackage</span>(&#123;</span><br><span class="line">        <span class="attr">dependencies</span>: &#123;</span><br><span class="line">            <span class="attr">vuex</span>: <span class="string">&#x27;^3.6.2&#x27;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;)</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 渲染模板</span></span><br><span class="line">    generator.<span class="title function_">render</span>(<span class="string">&#x27;./template&#x27;</span>, &#123;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到渲染的代码为 <code>generator.render(&#39;./template&#39;, &#123;&#125;)</code>。<code>./template</code> 是模板目录的路径：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/251d95f832a78599770c0b8050309a4c0314b7933ce3b4d902f78cbae4b40112/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f61373164646433656137323963303936313430393435646532616437343930622e706e67"><img src="/_v_images/20230116145032815_32324"></a></p>
+<p>所有的模板代码都放在 <code>template</code> 目录下，<code>vuex</code> 将会在用户创建的目录下的 <code>src</code> 目录生成 <code>store</code> 文件夹，里面有一个 <code>index.js</code> 文件。它的内容为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Vue</span> <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">Vuex</span> <span class="keyword">from</span> <span class="string">&#x27;vuex&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">Vue</span>.<span class="title function_">use</span>(<span class="title class_">Vuex</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> <span class="title class_">Vuex</span>.<span class="title class_">Store</span>(&#123;</span><br><span class="line">    <span class="attr">state</span>: &#123;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">mutations</span>: &#123;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">actions</span>: &#123;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">modules</span>: &#123;</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这里简单描述一下 <code>generator.render()</code> 的渲染过程。</p>
+<p><strong>第一步</strong>， 使用 <a target="_blank" rel="noopener" href="https://github.com/sindresorhus/globby">globby</a> 读取模板目录下的所有文件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> _files = <span class="keyword">await</span> <span class="title function_">globby</span>([<span class="string">&#x27;**/*&#x27;</span>], &#123; <span class="attr">cwd</span>: source, <span class="attr">dot</span>: <span class="literal">true</span> &#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>第二步</strong>，遍历所有读取的文件。如果文件是二进制文件，则不作处理，渲染时直接生成文件。否则读取文件内容，再调用 <a target="_blank" rel="noopener" href="https://github.com/mde/ejs">ejs</a> 进行渲染：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 返回文件内容</span></span><br><span class="line"><span class="keyword">const</span> template = fs.<span class="title function_">readFileSync</span>(name, <span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"><span class="keyword">return</span> ejs.<span class="title function_">render</span>(template, data, ejsOptions)</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>ejs</code> 的好处，就是可以结合变量来决定是否渲染某些代码。例如 <code>webpack</code> 的模板中有这样一段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">module</span>: &#123;</span><br><span class="line">      <span class="attr">rules</span>: [</span><br><span class="line">          &lt;%_ <span class="keyword">if</span> (hasBabel) &#123; _%&gt;</span><br><span class="line">          &#123;</span><br><span class="line">              <span class="attr">test</span>: <span class="regexp">/\.js$/</span>,</span><br><span class="line">              <span class="attr">loader</span>: <span class="string">&#x27;babel-loader&#x27;</span>,</span><br><span class="line">              <span class="attr">exclude</span>: <span class="regexp">/node_modules/</span>,</span><br><span class="line">          &#125;,</span><br><span class="line">          &lt;%_ &#125; _%&gt;</span><br><span class="line">      ],</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+
+<p><code>ejs</code> 可以根据用户是否选择了 <code>babel</code> 来决定是否渲染这段代码。如果 <code>hasBabel</code> 为 <code>false</code>，则这段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">test</span>: <span class="regexp">/\.js$/</span>,</span><br><span class="line">    <span class="attr">loader</span>: <span class="string">&#x27;babel-loader&#x27;</span>,</span><br><span class="line">    <span class="attr">exclude</span>: <span class="regexp">/node_modules/</span>,</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<p>将不会被渲染出来。<code>hasBabel</code> 的值是调用 <code>render()</code> 时用参数传过去的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">generator.<span class="title function_">render</span>(<span class="string">&#x27;./template&#x27;</span>, &#123;</span><br><span class="line">    <span class="attr">hasBabel</span>: options.<span class="property">features</span>.<span class="title function_">includes</span>(<span class="string">&#x27;babel&#x27;</span>),</span><br><span class="line">    <span class="attr">lintOnSave</span>: options.<span class="property">lintOn</span>.<span class="title function_">includes</span>(<span class="string">&#x27;save&#x27;</span>),</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>第三步</strong>，注入特定代码。回想一下刚才 <code>vuex</code> 中的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 向入口文件 `src/main.js` 注入代码 import store from &#x27;./store&#x27;</span></span><br><span class="line">generator.<span class="title function_">injectImports</span>(generator.<span class="property">entryFile</span>, <span class="string">`import store from &#x27;./store&#x27;`</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向入口文件 `src/main.js` 的 new Vue() 注入选项 store</span></span><br><span class="line">generator.<span class="title function_">injectRootOptions</span>(generator.<span class="property">entryFile</span>, <span class="string">`store`</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这两行代码的作用是：在项目入口文件 <code>src/main.js</code> 中注入特定的代码。</p>
+<p><code>vuex</code> 是 <code>vue</code> 的一个状态管理库，属于 <code>vue</code> 全家桶中的一员。如果创建的项目没有选择 <code>vuex</code> 和 <code>vue-router</code>。则 <code>src/main.js</code> 的代码为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Vue</span> <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">App</span> <span class="keyword">from</span> <span class="string">&#x27;./App.vue&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">Vue</span>.<span class="property">config</span>.<span class="property">productionTip</span> = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Vue</span>(&#123;</span><br><span class="line">    <span class="attr">render</span>: <span class="function">(<span class="params">h</span>) =&gt;</span> <span class="title function_">h</span>(<span class="title class_">App</span>),</span><br><span class="line">&#125;).$mount(<span class="string">&#x27;#app&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>如果选择了 <code>vuex</code>，它会注入上面所说的两行代码，现在 <code>src/main.js</code> 代码变为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Vue</span> <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br><span class="line"><span class="keyword">import</span> store <span class="keyword">from</span> <span class="string">&#x27;./store&#x27;</span> <span class="comment">// 注入的代码</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">App</span> <span class="keyword">from</span> <span class="string">&#x27;./App.vue&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">Vue</span>.<span class="property">config</span>.<span class="property">productionTip</span> = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Vue</span>(&#123;</span><br><span class="line">  store, <span class="comment">// 注入的代码</span></span><br><span class="line">  <span class="attr">render</span>: <span class="function">(<span class="params">h</span>) =&gt;</span> <span class="title function_">h</span>(<span class="title class_">App</span>),</span><br><span class="line">&#125;).$mount(<span class="string">&#x27;#app&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这里简单描述一下代码的注入过程：</p>
+<ol>
+<li>使用 <a target="_blank" rel="noopener" href="https://github.com/vuejs/vue-codemod">vue-codemod</a> 将代码解析成语法抽象树 AST。</li>
+<li>然后将要插入的代码变成 AST 节点插入到上面所说的 AST 中。</li>
+<li>最后将新的 AST 重新渲染成代码。</li>
+</ol>
+<h3 id="提取-package-json-的部分选项"><a href="#提取-package-json-的部分选项" class="headerlink" title="提取 package.json 的部分选项"></a>提取 <code>package.json</code> 的部分选项</h3><p>一些第三方库的配置项可以放在 <code>package.json</code> 文件，也可以自己独立生成一份文件。例如 <code>babel</code> 在 <code>package.json</code> 中注入的配置为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">babel<span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    presets<span class="punctuation">:</span> <span class="punctuation">[</span>&#x27;@babel/preset-env&#x27;<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以调用 <code>generator.extractConfigFiles()</code> 将内容提取出来并生成 <code>babel.config.js</code> 文件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">    <span class="attr">presets</span>: [<span class="string">&#x27;@babel/preset-env&#x27;</span>],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成文件"><a href="#生成文件" class="headerlink" title="生成文件"></a>生成文件</h3><p>渲染好的模板文件和 <code>package.json</code> 文件目前还是在内存中，并没有真正的在硬盘上创建。这时可以调用 <code>writeFileTree()</code> 将文件生成：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs-extra&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">writeFileTree</span>(<span class="params">dir, files</span>) &#123;</span><br><span class="line">    <span class="title class_">Object</span>.<span class="title function_">keys</span>(files).<span class="title function_">forEach</span>(<span class="function">(<span class="params">name</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> filePath = path.<span class="title function_">join</span>(dir, name)</span><br><span class="line">        fs.<span class="title function_">ensureDirSync</span>(path.<span class="title function_">dirname</span>(filePath))</span><br><span class="line">        fs.<span class="title function_">writeFileSync</span>(filePath, files[name])</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的逻辑如下：</p>
+<ol>
+<li>遍历所有渲染好的文件，逐一生成。</li>
+<li>在生成一个文件时，确认它的父目录在不在，如果不在，就先生成父目录。</li>
+<li>写入文件。</li>
+</ol>
+<p>例如现在一个文件路径为 <code>src/test.js</code>，第一次写入时，由于还没有 <code>src</code> 目录。所以会先生成 <code>src</code> 目录，再生成 <code>test.js</code> 文件。</p>
+<h3 id="webpack"><a href="#webpack" class="headerlink" title="webpack"></a>webpack</h3><p>webpack 需要提供开发环境下的热加载、编译等服务，还需要提供打包服务。目前 webpack 的代码比较少，功能比较简单。而且生成的项目中，webpack 配置代码是暴露出来的。这留待 v3 版本再改进。</p>
+<h3 id="添加新功能"><a href="#添加新功能" class="headerlink" title="添加新功能"></a>添加新功能</h3><p>添加一个新功能，需要在两个地方添加代码：分别是 <code>lib/promptModules</code> 和 <code>lib/generator</code>。在 <code>lib/promptModules</code> 中添加的是这个功能相关的交互提示语。在 <code>lib/generator</code> 中添加的是这个功能相关的依赖和模板代码。</p>
+<p>不过不是所有的功能都需要添加模板代码的，例如 <code>babel</code> 就不需要。在添加新功能时，有可能会对已有的模板代码造成影响。例如我现在需要项目支持 <code>ts</code>。除了添加 <code>ts</code> 相关的依赖，还得在 <code>webpack</code> <code>vue</code> <code>vue-router</code> <code>vuex</code> <code>linter</code> 等功能中修改原有的模板代码。</p>
+<p>举个例子，在 <code>vue-router</code> 中，如果支持 <code>ts</code>，则这段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> routes = [ <span class="comment">// ... ]</span></span><br></pre></td></tr></table></figure>
+
+<p>需要修改为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;%_ <span class="keyword">if</span> (hasTypeScript) &#123; _%&gt;</span><br><span class="line"><span class="keyword">const</span> <span class="attr">routes</span>: <span class="title class_">Array</span>&lt;<span class="title class_">RouteConfig</span>&gt; = [ <span class="comment">// ... ]</span></span><br><span class="line">&lt;%_ &#125; <span class="keyword">else</span> &#123; _%&gt;</span><br><span class="line"><span class="keyword">const</span> routes = [ <span class="comment">// ... ]</span></span><br><span class="line">&lt;%_ &#125; _%&gt;</span><br></pre></td></tr></table></figure>
+
+<p>因为 <code>ts</code> 的值有类型。</p>
+<p>总之，添加的新功能越多，各个功能的模板代码也会越来越多。并且还需要考虑到各个功能之间的影响。</p>
+<h3 id="下载依赖"><a href="#下载依赖" class="headerlink" title="下载依赖"></a>下载依赖</h3><p>下载依赖需要使用 <a target="_blank" rel="noopener" href="https://github.com/sindresorhus/execa">execa</a>，它可以调用子进程执行命令。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> execa = <span class="built_in">require</span>(<span class="string">&#x27;execa&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="keyword">function</span> <span class="title function_">executeCommand</span>(<span class="params">command, cwd</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> child = <span class="title function_">execa</span>(command, [], &#123;</span><br><span class="line">            cwd,</span><br><span class="line">            <span class="attr">stdio</span>: [<span class="string">&#x27;inherit&#x27;</span>, <span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;inherit&#x27;</span>],</span><br><span class="line">        &#125;)</span><br><span class="line"></span><br><span class="line">        child.<span class="property">stdout</span>.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function"><span class="params">buffer</span> =&gt;</span> &#123;</span><br><span class="line">            process.<span class="property">stdout</span>.<span class="title function_">write</span>(buffer)</span><br><span class="line">        &#125;)</span><br><span class="line"></span><br><span class="line">        child.<span class="title function_">on</span>(<span class="string">&#x27;close&#x27;</span>, <span class="function"><span class="params">code</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (code !== <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="title function_">reject</span>(<span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`command failed: <span class="subst">$&#123;command&#125;</span>`</span>))</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="title function_">resolve</span>()</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// create.js 文件</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;\n正在下载依赖...\n&#x27;</span>)</span><br><span class="line"><span class="comment">// 下载依赖</span></span><br><span class="line"><span class="keyword">await</span> <span class="title function_">executeCommand</span>(<span class="string">&#x27;npm install&#x27;</span>, path.<span class="title function_">join</span>(process.<span class="title function_">cwd</span>(), name))</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;\n依赖下载完成! 执行下列命令开始开发：\n&#x27;</span>)</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`cd <span class="subst">$&#123;name&#125;</span>`</span>)</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`npm run dev`</span>)</span><br></pre></td></tr></table></figure>
+
+<p>调用 <code>executeCommand()</code> 开始下载依赖，参数为 <code>npm install</code> 和用户创建的项目路径。为了能让用户看到下载依赖的过程，我们需要使用下面的代码将子进程的输出传给主进程，也就是输出到控制台：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">child.<span class="property">stdout</span>.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function"><span class="params">buffer</span> =&gt;</span> &#123;</span><br><span class="line">    process.<span class="property">stdout</span>.<span class="title function_">write</span>(buffer)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>下面我用动图演示一下 v1 版本的创建过程：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/a8e1a420fa2c7ba6aeb47374d3c8d51815aeb596584c8642b5456b32470fe23f/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f36323437393566336230336635303931383233316361353636306663386662612e676966"><img src="/_v_images/20230116145032406_930"></a></p>
+<p>创建成功的项目截图：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/f196e3bf355341938f2ddf24210c36a6296fb9d6865b11ed7fe373b5943b7ec2/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f37636564326438316335353737363535393365633434616435633931313534632e706e67"><img src="/_v_images/20230116145030195_30643"></a></p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/889035154d06b53a6ea8d0c4781ac29e8a2e6a8a9c26706442513aefd761f772/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f62663162326531313036356561333430356335353762353134333966623664322e706e67"><img src="/_v_images/20230116145029485_18001"></a></p>
+<h2 id="第二个版本-v2"><a href="#第二个版本-v2" class="headerlink" title="第二个版本 v2"></a>第二个版本 v2</h2><p>第二个版本在 v1 的基础上添加了一些辅助功能：</p>
+<ol>
+<li>创建项目时判断该项目是否已存在，支持覆盖和合并创建。</li>
+<li>选择功能时提供默认配置和手动选择两种模式。</li>
+<li>如果用户的环境同时存在 yarn 和 npm，则会提示用户要使用哪个包管理器。</li>
+<li>如果 npm 的默认源速度比较慢，则提示用户是否要切换到淘宝源。</li>
+<li>如果用户是手动选择功能，在结束后会询问用户是否要将这次的选择保存为默认配置。</li>
+</ol>
+<h3 id="覆盖和合并"><a href="#覆盖和合并" class="headerlink" title="覆盖和合并"></a>覆盖和合并</h3><p>创建项目时，先提前判断一下该项目是否存在：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> targetDir = path.<span class="title function_">join</span>(process.<span class="title function_">cwd</span>(), name)</span><br><span class="line"><span class="comment">// 如果目标目录已存在，询问是覆盖还是合并</span></span><br><span class="line"><span class="keyword">if</span> (fs.<span class="title function_">existsSync</span>(targetDir)) &#123;</span><br><span class="line">    <span class="comment">// 清空控制台</span></span><br><span class="line">    <span class="title function_">clearConsole</span>()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> &#123; action &#125; = <span class="keyword">await</span> inquirer.<span class="title function_">prompt</span>([</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;action&#x27;</span>,</span><br><span class="line">            <span class="attr">type</span>: <span class="string">&#x27;list&#x27;</span>,</span><br><span class="line">            <span class="attr">message</span>: <span class="string">`Target directory <span class="subst">$&#123;chalk.cyan(targetDir)&#125;</span> already exists. Pick an action:`</span>,</span><br><span class="line">            <span class="attr">choices</span>: [</span><br><span class="line">                &#123; <span class="attr">name</span>: <span class="string">&#x27;Overwrite&#x27;</span>, <span class="attr">value</span>: <span class="string">&#x27;overwrite&#x27;</span> &#125;,</span><br><span class="line">                &#123; <span class="attr">name</span>: <span class="string">&#x27;Merge&#x27;</span>, <span class="attr">value</span>: <span class="string">&#x27;merge&#x27;</span> &#125;,</span><br><span class="line">            ],</span><br><span class="line">        &#125;,</span><br><span class="line">    ])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (action === <span class="string">&#x27;overwrite&#x27;</span>) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`\nRemoving <span class="subst">$&#123;chalk.cyan(targetDir)&#125;</span>...`</span>)</span><br><span class="line">        <span class="keyword">await</span> fs.<span class="title function_">remove</span>(targetDir)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/0205e2625e2a5c84577a4c3a648d36fab9ce1d2110e0101c84530141e6c0603e/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f61643464333765653663326532353966306230613530396531363436626635342e706e67"><img src="/_v_images/20230116145028377_2741"></a></p>
+<p>如果选择 <code>overwrite</code>，则进行移除 <code>fs.remove(targetDir)</code>。</p>
+<h3 id="默认配置和手动模式"><a href="#默认配置和手动模式" class="headerlink" title="默认配置和手动模式"></a>默认配置和手动模式</h3><p>先在代码中提前把默认配置的代码写好：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exports</span>.<span class="property">defaultPreset</span> = &#123;</span><br><span class="line">    <span class="attr">features</span>: [<span class="string">&#x27;babel&#x27;</span>, <span class="string">&#x27;linter&#x27;</span>],</span><br><span class="line">    <span class="attr">historyMode</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">eslintConfig</span>: <span class="string">&#x27;airbnb&#x27;</span>,</span><br><span class="line">    <span class="attr">lintOn</span>: [<span class="string">&#x27;save&#x27;</span>],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个配置默认使用 <code>babel</code> 和 <code>eslint</code>。</p>
+<p>然后生成交互提示语时，先调用 <code>getDefaultPrompts()</code> 方法获取默认配置。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">getDefaultPrompts</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> presets = <span class="variable language_">this</span>.<span class="title function_">getPresets</span>()</span><br><span class="line">    <span class="keyword">const</span> presetChoices = <span class="title class_">Object</span>.<span class="title function_">entries</span>(presets).<span class="title function_">map</span>(<span class="function">(<span class="params">[name, preset]</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> displayName = name</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">`<span class="subst">$&#123;displayName&#125;</span> (<span class="subst">$&#123;preset.features&#125;</span>)`</span>,</span><br><span class="line">            <span class="attr">value</span>: name,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> presetPrompt = &#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;preset&#x27;</span>,</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&#x27;list&#x27;</span>,</span><br><span class="line">        <span class="attr">message</span>: <span class="string">`Please pick a preset:`</span>,</span><br><span class="line">        <span class="attr">choices</span>: [</span><br><span class="line">            <span class="comment">// 默认配置</span></span><br><span class="line">            ...presetChoices,</span><br><span class="line">            <span class="comment">// 这是手动模式提示语</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">name</span>: <span class="string">&#x27;Manually select features&#x27;</span>,</span><br><span class="line">                <span class="attr">value</span>: <span class="string">&#x27;__manual__&#x27;</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">        ],</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> featurePrompt = &#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;features&#x27;</span>,</span><br><span class="line">        <span class="attr">when</span>: isManualMode,</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&#x27;checkbox&#x27;</span>,</span><br><span class="line">        <span class="attr">message</span>: <span class="string">&#x27;Check the features needed for your project:&#x27;</span>,</span><br><span class="line">        <span class="attr">choices</span>: [],</span><br><span class="line">        <span class="attr">pageSize</span>: <span class="number">10</span>,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        presetPrompt,</span><br><span class="line">        featurePrompt,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样配置后，在用户选择功能前会先弹出这样的提示语：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/41e4346f437548e10e49da155f1417e799bbb52771c185d50c7d7014755af9ee/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f61643934333234326130313135386130393264373433363632313762626135332e706e67"><img src="/_v_images/20230116145027869_10976"></a></p>
+<h3 id="包管理器"><a href="#包管理器" class="headerlink" title="包管理器"></a>包管理器</h3><p>在 <code>vue-cli</code> 创建项目时，会生成一个 <code>.vuerc</code> 文件，里面会记录一些关于项目的配置信息。例如使用哪个包管理器、npm 源是否使用淘宝源等等。为了避免和 <code>vue-cli</code> 冲突，本脚手架生成的配置文件为 <code>.mvcrc</code>。</p>
+<p>这个 <code>.mvcrc</code> 文件保存在用户的 <code>home</code> 目录下（不同操作系统目录不同）。我的是 win10 操作系统，保存目录为 <code>C:\Users\bin</code>。获取用户的 <code>home</code> 目录可以通过以下代码获取：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> os = <span class="built_in">require</span>(<span class="string">&#x27;os&#x27;</span>)</span><br><span class="line">os.<span class="title function_">homedir</span>()</span><br></pre></td></tr></table></figure>
+
+<p><code>.mvcrc</code> 文件还会保存用户创建项目的配置，这样当用户重新创建项目时，就可以直接选择以前创建过的配置，不用再一步步的选择项目功能。</p>
+<p>在第一次创建项目时，<code>.mvcrc</code> 文件是不存在的。如果这时用户还安装了 yarn，脚手架就会提示用户要使用哪个包管理器：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读取 `.mvcrc` 文件</span></span><br><span class="line"><span class="keyword">const</span> savedOptions = <span class="title function_">loadOptions</span>()</span><br><span class="line"><span class="comment">// 如果没有指定包管理器并且存在 yarn</span></span><br><span class="line"><span class="keyword">if</span> (!savedOptions.<span class="property">packageManager</span> &amp;&amp; hasYarn) &#123;</span><br><span class="line">    <span class="keyword">const</span> packageManagerChoices = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_">hasYarn</span>()) &#123;</span><br><span class="line">        packageManagerChoices.<span class="title function_">push</span>(&#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;Use Yarn&#x27;</span>,</span><br><span class="line">            <span class="attr">value</span>: <span class="string">&#x27;yarn&#x27;</span>,</span><br><span class="line">            <span class="attr">short</span>: <span class="string">&#x27;Yarn&#x27;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    packageManagerChoices.<span class="title function_">push</span>(&#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;Use NPM&#x27;</span>,</span><br><span class="line">        <span class="attr">value</span>: <span class="string">&#x27;npm&#x27;</span>,</span><br><span class="line">        <span class="attr">short</span>: <span class="string">&#x27;NPM&#x27;</span>,</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    otherPrompts.<span class="title function_">push</span>(&#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;packageManager&#x27;</span>,</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&#x27;list&#x27;</span>,</span><br><span class="line">        <span class="attr">message</span>: <span class="string">&#x27;Pick the package manager to use when installing dependencies:&#x27;</span>,</span><br><span class="line">        <span class="attr">choices</span>: packageManagerChoices,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/ec8788ccacaaf0734790b332f4fb9b82c832b68afbb7b46296100910c3c05d39/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f30663337376465663163643566393235643934363835616238663731323339362e706e67"><img src="/_v_images/20230116145027458_12326"></a></p>
+<p>当用户选择 yarn 后，下载依赖的命令就会变为 <code>yarn</code>；如果选择了 npm，下载命令则为 <code>npm install</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="variable constant_">PACKAGE_MANAGER_CONFIG</span> = &#123;</span><br><span class="line">    <span class="attr">npm</span>: &#123;</span><br><span class="line">        <span class="attr">install</span>: [<span class="string">&#x27;install&#x27;</span>],</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">yarn</span>: &#123;</span><br><span class="line">        <span class="attr">install</span>: [],</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">await</span> <span class="title function_">executeCommand</span>(</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">bin</span>, <span class="comment">// &#x27;yarn&#x27; or &#x27;npm&#x27;</span></span><br><span class="line">    [</span><br><span class="line">        ...<span class="variable constant_">PACKAGE_MANAGER_CONFIG</span>[<span class="variable language_">this</span>.<span class="property">bin</span>][command],</span><br><span class="line">        ...(args || []),</span><br><span class="line">    ],</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">context</span>,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="切换-npm-源"><a href="#切换-npm-源" class="headerlink" title="切换 npm 源"></a>切换 npm 源</h3><p>当用户选择了项目功能后，会先调用 <code>shouldUseTaobao()</code> 方法判断是否需要切换淘宝源：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> execa = <span class="built_in">require</span>(<span class="string">&#x27;execa&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> chalk = <span class="built_in">require</span>(<span class="string">&#x27;chalk&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> request = <span class="built_in">require</span>(<span class="string">&#x27;./request&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> &#123; hasYarn &#125; = <span class="built_in">require</span>(<span class="string">&#x27;./env&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> inquirer = <span class="built_in">require</span>(<span class="string">&#x27;inquirer&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> registries = <span class="built_in">require</span>(<span class="string">&#x27;./registries&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> &#123; loadOptions, saveOptions &#125; = <span class="built_in">require</span>(<span class="string">&#x27;./options&#x27;</span>)</span><br><span class="line">  </span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">ping</span>(<span class="params">registry</span>) &#123;</span><br><span class="line">    <span class="keyword">await</span> request.<span class="title function_">get</span>(<span class="string">`<span class="subst">$&#123;registry&#125;</span>/vue-cli-version-marker/latest`</span>)</span><br><span class="line">    <span class="keyword">return</span> registry</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">function</span> <span class="title function_">removeSlash</span>(<span class="params">url</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> url.<span class="title function_">replace</span>(<span class="regexp">/\/$/</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">let</span> checked</span><br><span class="line"><span class="keyword">let</span> result</span><br><span class="line">  </span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">shouldUseTaobao</span>(<span class="params">command</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!command) &#123;</span><br><span class="line">        command = <span class="title function_">hasYarn</span>() ? <span class="string">&#x27;yarn&#x27;</span> : <span class="string">&#x27;npm&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// ensure this only gets called once.</span></span><br><span class="line">    <span class="keyword">if</span> (checked) <span class="keyword">return</span> result</span><br><span class="line">    checked = <span class="literal">true</span></span><br><span class="line">  </span><br><span class="line">    <span class="comment">// previously saved preference</span></span><br><span class="line">    <span class="keyword">const</span> saved = <span class="title function_">loadOptions</span>().<span class="property">useTaobaoRegistry</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> saved === <span class="string">&#x27;boolean&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> (result = saved)</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">save</span> = val =&gt; &#123;</span><br><span class="line">        result = val</span><br><span class="line">        <span class="title function_">saveOptions</span>(&#123; <span class="attr">useTaobaoRegistry</span>: val &#125;)</span><br><span class="line">        <span class="keyword">return</span> val</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">let</span> userCurrent</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        userCurrent = (<span class="keyword">await</span> <span class="title function_">execa</span>(command, [<span class="string">&#x27;config&#x27;</span>, <span class="string">&#x27;get&#x27;</span>, <span class="string">&#x27;registry&#x27;</span>])).<span class="property">stdout</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (registryError) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// Yarn 2 uses `npmRegistryServer` instead of `registry`</span></span><br><span class="line">            userCurrent = (<span class="keyword">await</span> <span class="title function_">execa</span>(command, [<span class="string">&#x27;config&#x27;</span>, <span class="string">&#x27;get&#x27;</span>, <span class="string">&#x27;npmRegistryServer&#x27;</span>])).<span class="property">stdout</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (npmRegistryServerError) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="title function_">save</span>(<span class="literal">false</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">const</span> defaultRegistry = registries[command]</span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_">removeSlash</span>(userCurrent) !== <span class="title function_">removeSlash</span>(defaultRegistry)) &#123;</span><br><span class="line">        <span class="comment">// user has configured custom registry, respect that</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">save</span>(<span class="literal">false</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">let</span> faster</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        faster = <span class="keyword">await</span> <span class="title class_">Promise</span>.<span class="title function_">race</span>([</span><br><span class="line">            <span class="title function_">ping</span>(defaultRegistry),</span><br><span class="line">            <span class="title function_">ping</span>(registries.<span class="property">taobao</span>),</span><br><span class="line">        ])</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">save</span>(<span class="literal">false</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (faster !== registries.<span class="property">taobao</span>) &#123;</span><br><span class="line">        <span class="comment">// default is already faster</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">save</span>(<span class="literal">false</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (process.<span class="property">env</span>.<span class="property">VUE_CLI_API_MODE</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">save</span>(<span class="literal">true</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// ask and save preference</span></span><br><span class="line">    <span class="keyword">const</span> &#123; useTaobaoRegistry &#125; = <span class="keyword">await</span> inquirer.<span class="title function_">prompt</span>([</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;useTaobaoRegistry&#x27;</span>,</span><br><span class="line">            <span class="attr">type</span>: <span class="string">&#x27;confirm&#x27;</span>,</span><br><span class="line">            <span class="attr">message</span>: chalk.<span class="title function_">yellow</span>(</span><br><span class="line">                <span class="string">` Your connection to the default <span class="subst">$&#123;command&#125;</span> registry seems to be slow.\n`</span></span><br><span class="line">            + <span class="string">`   Use <span class="subst">$&#123;chalk.cyan(registries.taobao)&#125;</span> for faster installation?`</span>,</span><br><span class="line">            ),</span><br><span class="line">        &#125;,</span><br><span class="line">    ])</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 注册淘宝源</span></span><br><span class="line">    <span class="keyword">if</span> (useTaobaoRegistry) &#123;</span><br><span class="line">        <span class="keyword">await</span> <span class="title function_">execa</span>(command, [<span class="string">&#x27;config&#x27;</span>, <span class="string">&#x27;set&#x27;</span>, <span class="string">&#x27;registry&#x27;</span>, registries.<span class="property">taobao</span>])</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">save</span>(useTaobaoRegistry)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码的逻辑为：</p>
+<ol>
+<li>先判断默认配置文件 <code>.mvcrc</code> 是否有 <code>useTaobaoRegistry</code> 选项。如果有，直接将结果返回，无需判断。</li>
+<li>向 npm 默认源和淘宝源各发一个 <code>get</code> 请求，通过 <code>Promise.race()</code> 来调用。这样更快的那个请求会先返回，从而知道是默认源还是淘宝源速度更快。</li>
+<li>如果淘宝源速度更快，向用户提示是否切换到淘宝源。</li>
+<li>如果用户选择淘宝源，则调用 <code>await execa(command, [&#39;config&#39;, &#39;set&#39;, &#39;registry&#39;, registries.taobao])</code> 将当前 npm 的源改为淘宝源，即 <code>npm config set registry https://registry.npm.taobao.org</code>。如果是 yarn，则命令为 <code>yarn config set registry https://registry.npm.taobao.org</code>。</li>
+</ol>
+<h4 id="一点疑问"><a href="#一点疑问" class="headerlink" title="一点疑问"></a>一点疑问</h4><p>其实 <code>vue-cli</code> 是没有这段代码的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注册淘宝源</span></span><br><span class="line"><span class="keyword">if</span> (useTaobaoRegistry) &#123;</span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">execa</span>(command, [<span class="string">&#x27;config&#x27;</span>, <span class="string">&#x27;set&#x27;</span>, <span class="string">&#x27;registry&#x27;</span>, registries.<span class="property">taobao</span>])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这是我自己加的。主要是我没有在 <code>vue-cli</code> 中找到显式注册淘宝源的代码，它只是从配置文件读取出是否使用淘宝源，或者将是否使用淘宝源这个选项写入配置文件。另外 npm 的配置文件 <code>.npmrc</code> 是可以更改默认源的，如果在 <code>.npmrc</code> 文件直接写入淘宝的镜像地址，那 npm 就会使用淘宝源下载依赖。但 npm 肯定不会去读取 <code>.vuerc</code> 的配置来决定是否使用淘宝源。</p>
+<p>对于这一点我没搞明白，所以在用户选择了淘宝源之后，手动调用命令注册一遍。</p>
+<h3 id="将项目功能保存为默认配置"><a href="#将项目功能保存为默认配置" class="headerlink" title="将项目功能保存为默认配置"></a>将项目功能保存为默认配置</h3><p>如果用户创建项目时选择手动模式，在选择完一系列功能后，会弹出下面的提示语：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/22d69a64215911c195b5b006951afe776dec63aed471d236756df21848449b8e/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f31646337656630333038666663316363366139373761316237356563373333662e706e67"><img src="/_v_images/20230116145025349_32309"></a></p>
+<p>询问用户是否将这次的项目选择保存为默认配置，如果用户选择是，则弹出下一个提示语：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/192b6f08513cffb4af2584b0d8a9a92f8b6e23f06b2160a205e5a86b87501bd5/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f36326665326431643635373839303535626164323834653939353239636566302e706e67"><img src="/_v_images/20230116145024828_4298"></a></p>
+<p>让用户输入保存配置的名称。</p>
+<p>这两句提示语相关的代码为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> otherPrompts = [</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;save&#x27;</span>,</span><br><span class="line">        <span class="attr">when</span>: isManualMode,</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&#x27;confirm&#x27;</span>,</span><br><span class="line">        <span class="attr">message</span>: <span class="string">&#x27;Save this as a preset for future projects?&#x27;</span>,</span><br><span class="line">        <span class="attr">default</span>: <span class="literal">false</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;saveName&#x27;</span>,</span><br><span class="line">        <span class="attr">when</span>: <span class="function"><span class="params">answers</span> =&gt;</span> answers.<span class="property">save</span>,</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&#x27;input&#x27;</span>,</span><br><span class="line">        <span class="attr">message</span>: <span class="string">&#x27;Save preset as:&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>保存配置的代码为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exports</span>.<span class="property">saveOptions</span> = <span class="function">(<span class="params">toSave</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> options = <span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="title function_">cloneDeep</span>(<span class="built_in">exports</span>.<span class="title function_">loadOptions</span>()), toSave)</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> options) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!(key <span class="keyword">in</span> <span class="built_in">exports</span>.<span class="property">defaults</span>)) &#123;</span><br><span class="line">            <span class="keyword">delete</span> options[key]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cachedOptions = options</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        fs.<span class="title function_">writeFileSync</span>(rcPath, <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(options, <span class="literal">null</span>, <span class="number">2</span>))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="title function_">error</span>(</span><br><span class="line">            <span class="string">`Error saving preferences: `</span></span><br><span class="line">      + <span class="string">`make sure you have write access to <span class="subst">$&#123;rcPath&#125;</span>.\n`</span></span><br><span class="line">      + <span class="string">`(<span class="subst">$&#123;e.message&#125;</span>)`</span>,</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">savePreset</span> = <span class="function">(<span class="params">name, preset</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> presets = <span class="title function_">cloneDeep</span>(<span class="built_in">exports</span>.<span class="title function_">loadOptions</span>().<span class="property">presets</span> || &#123;&#125;)</span><br><span class="line">    presets[name] = preset</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">exports</span>.<span class="title function_">saveOptions</span>(&#123; presets &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上代码直接将用户的配置保存到 <code>.mvcrc</code> 文件中。下面是我电脑上的 <code>.mvcrc</code> 的内容：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;packageManager&quot;</span><span class="punctuation">:</span> <span class="string">&quot;npm&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;presets&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;test&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;features&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;babel&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;linter&quot;</span></span><br><span class="line">      <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;eslintConfig&quot;</span><span class="punctuation">:</span> <span class="string">&quot;airbnb&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;lintOn&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;save&quot;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;demo&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;features&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;babel&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;linter&quot;</span></span><br><span class="line">      <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;eslintConfig&quot;</span><span class="punctuation">:</span> <span class="string">&quot;airbnb&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;lintOn&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;save&quot;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;useTaobaoRegistry&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>下次再创建项目时，脚手架就会先读取这个配置文件的内容，让用户决定是否使用已有的配置来创建项目。</p>
+<p>至此，v2 版本的内容就介绍完了。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>由于 <code>vue-cli</code> 关于插件的源码我还没有看完，所以这篇文章只讲解前两个版本的源码。v3 版本等我看完 <code>vue-cli</code> 的源码再回来填坑，预计在 3 月初就可以完成。</p>
+
+                
+                <p class="end">__END__</p>
+            </div>
+            <div class="article-footer">
+                <div class="suffix-box">
+    <div class="suffix-box-left">
+        <img src="/image/sidebar/avatar.jpg" alt="edward">
+    </div>
+    <div class="suffix-box-right">
+        <span class="suffix-box-title">文章作者：</span>edward
+        <br>
+        <span class="suffix-box-title">文章出处：</span><a href="/2023/01/29/%E8%84%9A%E6%89%8B%E6%9E%B6%E6%90%AD%E5%BB%BA/" target="_blank">脚手架搭建</a>
+        <br>
+        <span class="suffix-box-title">作者签名：</span>迷途漫漫终有一归
+        <br>
+        <span class="suffix-box-title">关于主题：</span><a href="https://github.com/first19326/Hexo-LiveForCode" target="_blank">Hexo - Live For Code</a>
+        <br>
+        <span class="suffix-box-title">版权声明：</span>文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="BY-NC-SA" target="_blank">BY-NC-SA</a> 许可协议，转载请注明出处
+        <br>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+                
+                
+                <div class="article-prev-next">
+                    
+                    
+                        <a href="/2022/10/20/%E6%9B%B4%E5%85%A8%E9%9D%A2%E7%9A%84axios%E5%B0%81%E8%A3%85/" class="next-prefix">» </a> 下一篇：    <a href="/2022/10/20/%E6%9B%B4%E5%85%A8%E9%9D%A2%E7%9A%84axios%E5%B0%81%E8%A3%85/" title="发布于 2022-10-20 04:34">更全面的axios封装</a>
+                    
+                </div>
+            </div>
+            
+    <div class="article-comments">
+        
+            <div class="comments-title">
+                评论列表
+            </div>
+        
+        <div class="comments-content"></div>
+    </div>
+
+        </div>
+    
+</div>
+    <div id="footer"></div>
+    <div id="sidebar">
+    <div class="menu-wrap" style="display:none;">
+        
+            <div class="menu-notice">
+                <span class="iconfont icon-notice"></span>
+                <div class="notice">
+                    <span>迷途漫漫终有一归</span>
+                </div>
+            </div>
+        
+        <nav class="menu">
+            <div class="menu-introduce"> 
+                <div class="introduce-avatar">
+                    <img src="/image/sidebar/avatar.jpg">
+                </div> 
+                <div class="introduce-info"> 
+                    <div class="introduce-user"><span>edward</span></div>
+                </div> 
+            </div> 
+            <div class="menu-list">
+                <ul>
+                    
+                        <li class=""><a href="/" class="" target="_self"><span class="iconfont icon-home-fill"></span>首页</a></li>
+                    
+                        <li class=""><a href="/category" class="" target="_self"><span class="iconfont icon-folder-fill"></span>分类</a></li>
+                    
+                        <li class=""><a href="/tag" class="" target="_self"><span class="iconfont icon-discount-fill"></span>标签</a></li>
+                    
+                        <li class=""><a href="/donate" class="" target="_self"><span class="iconfont icon-heart-fill"></span>赞赏</a></li>
+                    
+                        <li class=""><a href="/about" class="" target="_self"><span class="iconfont icon-about-fill"></span>关于</a></li>
+                    
+                        <li class=""><a href="javascript:;" class="search" target="_self"><span class="iconfont icon-search-menu"></span>搜索</a></li>
+                    
+                        <li class=""><a href="/comment" class="" target="_self"><span class="iconfont icon-comments-fill"></span>留言板</a></li>
+                    
+                        <li class=""><a href="/friend" class="" target="_self"><span class="iconfont icon-link"></span>友情链接</a></li>
+                    
+                </ul> 
+            </div> 
+            <div class="menu-link">
+                <div class="box">
+                    <div class="image-box"></div>
+                </div>
+                
+                    <a name="QQ" href="javascript:;" class="image" target="_self" data="/image/sidebar/qq.png"><span class="iconfont icon-qq"></span></a>
+                
+            </div> 
+        </nav>
+        <button class="menu-button-close"></button>
+        <div class="morph-shape" id="morph-shape" data-morph-open="M-7.312,0H15c0,0,66,113.339,66,399.5C81,664.006,15,800,15,800H-7.312V0z;M-7.312,0H100c0,0,0,113.839,0,400c0,264.506,0,400,0,400H-7.312V0z">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 800" preserveAspectRatio="none">
+                <path d="M-7.312,0H0c0,0,0,113.839,0,400c0,264.506,0,400,0,400h-7.312V0z"/>
+            </svg>
+        </div>
+    </div>
+    <button class="menu-button-open">MENU</button>
+    <div class="menu-cover"></div>
+</div>
+    <link type="text/css" rel="stylesheet" href="/css/search.css">
+<script type="text/javascript" src="/js/iscroll.js"></script>
+<script type="text/javascript" src="/js/instantsearch.min.js"></script>
+<div class="search-window">
+    <div class="search-content">
+        <div class="search-content-icon">
+            <i class="iconfont icon-search"></i>
+        </div>
+        <div id="search-input" class="search-input"></div>
+    </div>
+
+    <div class="search-scroll">
+        <div class="search-result">
+            <div id="search-stats" class="search-stats"></div>
+            <div id="search-hits"></div>
+            <div id="search-pagination" class="search-pagination"></div>
+        </div>
+    </div>
+
+    <span class="search-close-icon">
+        <i class="iconfont icon-close"></i>
+    </span>
+</div>
+    <div id="tools">
+    <div class="progressbar-top"></div>
+
+    
+        <link type="text/css" rel="stylesheet" href="/css/APlayer.css">
+        <script type="text/javascript" src="/js/APlayer.min.js"></script>
+        <script type="text/javascript" src="/js/Meting.min.js"></script>
+        <meting-js id="3778678" lrcshow="false" server="netease" type="playlist" fixed="true" autoplay="false" loop="all" order="random" preload="auto" volume="0.67" mutex="true"></meting-js>
+    
+    
+    <div class="wrap-right">
+        <div class="setting">
+            <div class="iconbox favorites" switch="false">
+                <span class="iconfont icon-favorites"></span>
+                <span class="icontext">关注</span>
+            </div>
+            <div class="iconbox mode">
+                <div class="light">
+                    <span class="iconfont icon-daymode"></span>
+                    <span class="icontext">浅色模式</span>
+                </div>
+                <div class="dark">
+                    <span class="iconfont icon-nightmode-fill"></span>
+                    <span class="icontext">深色模式</span>
+                </div>
+            </div>
+            <a href="javascript:;" target="_self" class="search">
+                <div class="iconbox">
+                    <span class="iconfont icon-search-menu"></span>
+                    <span class="icontext">搜索</span>
+                </div>
+            </a>
+            <div class="iconbox bottom">
+                <div style="display: inline-block; transform: rotate(180deg);">
+                    <span class="iconfont icon-top"></span>
+                </div>
+                <span class="icontext">跳至底部</span>
+            </div>
+        </div>
+        <div class="iconbox set">
+            <div style="display: inline-block;">
+                <span class="iconfont icon-setting"></span>
+            </div>
+            <span class="icontext">设置</span>
+        </div>
+        <div class="iconbox top">
+            <span class="iconfont icon-top"></span>
+            <span class="icontext">返回顶部</span>
+        </div>
+    </div>
+    <div class="loading"></div>
+</div>
+    <script>
+    window.config = {
+        GitHubUserName     : "first19326",
+        GitHubRepositories : "Hexo-LiveForCode",
+
+        User             : "edward",
+        UserAvatar       : "/image/sidebar/avatar.jpg",
+        WebsiteStartDate : "2020-01-01",
+
+        WebsiteTitleBlur         : "(◍´꒳`◍) Hi, edward",
+        WebsiteTitleBlurTimeOut  : 500,
+        WebsiteTitleFocus        : "(*´∇｀*) 欢迎回来!",
+        WebsiteTitleFocusTimeOut : 1000,
+        WebsiteFavicon           : "/image/website/logo.png",
+
+        ProgressBar : {
+            id       : "topProgressBar",
+            color    : "#77B6FF",
+            height   : "2px",
+            duration : 0.2
+        },
+
+        Loading: {
+            rebound : {
+                tension  : 16,
+                friction : 5
+            },
+            spinner : {
+                id     : "spinner",
+                radius : 90,
+                sides  : 3,
+                depth  : 4,
+                colors : {
+                    background : "#F0F0F0",
+                    stroke     : "#272633",
+                    base       : "",
+                    child      : "#272633"
+                },
+                alwaysForward : true,
+                restAt        : 0.5,
+                renderBase    : false
+            }
+        },
+
+        HomeHeaderAnimationRendered : true,
+        HomeHeaderAnimation         : {
+            radius      : 15,
+            density     : 0.2,
+            color       : "rgba(255, 255, 255, .2)",
+            clearOffset : 0.3
+        },
+
+        BackAnimationRendered          : true,
+        IEBrowserBackAnimationRendered : false,
+        BackAnimation                  : {
+            colorSaturation  : "60%",
+            colorBrightness  : "50%",
+            colorAlpha       : 0.5,
+            colorCycleSpeed  : 5,
+            verticalPosition : "random",
+            horizontalSpeed  : 200,
+            ribbonCount      : 3,
+            strokeSize       : 0,
+            parallaxAmount   : -0.2,
+            animateSections  : true
+        },
+
+        HomeHeaderImage : [
+            
+                "/image/header/home.jpg",
+            
+                "/image/header/home.jpeg",
+            
+        ],
+        HomeBannerText  : "",
+
+        ArticleHeaderImage : [
+            
+                "/image/header/article.jpg",
+            
+        ],
+
+        OtherBannerText : "",
+
+        Error : {
+            icon    : "icon-swimming",
+            title   : "PAGE NOT FOUND",
+            content : [
+                
+                    "很抱歉，您访问的页面不存在！",
+                
+                    "可能是输入地址有误或该地址已变更。",
+                
+            ],
+            buttons : [
+                
+                    {
+                        icon  : "icon-home",
+                        text  : "返回首页",
+                        href  : "/",
+                        class : ""
+                    },
+                
+            ]
+        },
+
+        MenuNotice : {
+            enable : true,
+            notice : "迷途漫漫终有一归",
+            speed  : 20
+        },
+        MenuList : [
+            
+                {
+                    name   : "首页",
+                    icon   : "icon-home-fill",
+                    href   : "/",
+                    type   : "index",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "分类",
+                    icon   : "icon-folder-fill",
+                    href   : "/category",
+                    type   : "category",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "标签",
+                    icon   : "icon-discount-fill",
+                    href   : "/tag",
+                    type   : "tag",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "赞赏",
+                    icon   : "icon-heart-fill",
+                    href   : "/donate",
+                    type   : "donate",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "关于",
+                    icon   : "icon-about-fill",
+                    href   : "/about",
+                    type   : "about",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "搜索",
+                    icon   : "icon-search-menu",
+                    href   : "javascript:;",
+                    type   : "",
+                    class  : "search",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "留言板",
+                    icon   : "icon-comments-fill",
+                    href   : "/comment",
+                    type   : "comment",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "友情链接",
+                    icon   : "icon-link",
+                    href   : "/friend",
+                    type   : "friend",
+                    class  : "",
+                    target : "_self"
+                },
+            
+        ],
+        MenuLink : [
+            
+                
+                    {
+                        name   : "QQ",
+                        icon   : "icon-qq",
+                        href   : "javascript:;",
+                        class  : "image",
+                        target : "_self",
+                        image  : "/image/sidebar/qq.png"
+                    },
+                
+            
+        ],
+
+        FooterStyle : 2,
+        BottomText  : "<div><span class='face'>ღゝ◡╹)ノ♡</span></div><div>【人生若只如初见<span><i class='iconfont icon-like-fill'></i></span>何事秋风悲画扇】</div><div>&copy; 2020-2022 WorstOne. All Rights Reserved.</div>",
+
+        ConsoleList : [
+            
+                
+                    [
+                        
+                            
+                                "Based on cnblogs theme SimpleMemory.",
+                            
+                                "",
+                            
+                        
+                    ],
+                
+                    [
+                        
+                            
+                                "SimpleMemory Author:",
+                            
+                                "BNDong",
+                            
+                        
+                    ],
+                
+                    [
+                        
+                            
+                                "Theme:",
+                            
+                                "LiveForCode",
+                            
+                        
+                    ],
+                
+            
+        ],
+
+        FontIconExtend : "",
+
+        Donate : {
+            paypal  : "",
+            bitcoin : "",
+            alipay  : "/image/donate/alipay.png",
+            wechat  : "/image/donate/wechat.png"
+        },
+
+        Search : {
+            applicationID : "010C3EANT8",
+            apiKey        : "c7abab9f11b79102b9aff7fe6d41447d",
+            indexName     : "Notes",
+            hits          : {
+                page : 10
+            },
+            labels        : {
+                placeholder : "搜索",
+                empty       : "未发现与 「${query}」 相关的内容",
+                stats       : "${hits} 条相关条目，使用了 ${time} 毫秒",
+            }
+        }, 
+
+        Valine : {
+            switch         : true,
+            el             : ".comments-content",
+            appId          : "srhKtvWPQTWYKh3qX8G8M7v0-gzGzoHsz",
+            appKey         : "8uVSP1q6UlALVC5igYfIfv2h",
+            serverURLs     : "",
+            placeholder    : "你是我一生只会遇见一次的惊喜...",
+            avatar         : "mm",
+            meta           : "nick,mail,link",
+            requiredFields : "nick,mail",
+            pageSize       : 5,
+            lang           : "zh-cn",
+            visitor        : true,
+            enableQQ       : true
+        },
+
+        Tocbot : {
+            switch                : true,
+            tocSelector           : ".toc",
+            contentSelector       : ".article-body",
+            headingSelector       : "h1, h2, h3, h4, h5",
+            headingsOffset        : 0,
+            scrollSmooth          : true,
+            scrollSmoothOffset    : -5,
+            positionFixedSelector : ".toc",
+            positionFixedClass    : "toc-fixed",
+            fixedSidebarOffset    : "",
+        },
+
+        Require : {
+            baseUrl     : "/js/",
+            waitSeconds : 100
+        },
+
+        Music : {
+            type : "Meting"
+        },
+        APlayer : {
+            container : ".aplayer",
+            fixed     : true,
+            autoplay  : false,
+            loop      : "all",
+            order     : "random",
+            preload   : "auto",
+            volume    : 0.67,
+            mutex     : true,
+            lrcType   : 3,
+            audio     : [
+                
+                    {
+                        name   : "Endless Tears",
+                        artist : "CLIFF EDGE",
+                        cover  : "/music/cover/Endless Tears.jpg",
+                        url    : "/music/song/Endless Tears.mp3",
+                        lrc    : "/music/lrc/Endless Tears.lrc"
+                    },
+                
+            ]
+        },
+        Meting : {
+            id       : "3778678", 
+            lrcshow  : false, 
+            server   : "netease", 
+            type     : "playlist", 
+            fixed    : true, 
+            autoplay : false, 
+            loop     : "all", 
+            order    : "random", 
+            preload  : "auto", 
+            volume   : 0.67, 
+            mutex    : true
+        },
+
+        Mouse : {
+            enable  : true,
+            options : {
+                size  : 6,
+                sizeF : 24
+            }
+        },
+
+        LazyLoad : {
+            default : "/image/website/lazyload.svg"
+        },
+  
+        Style : {
+            aplayer          : "/css/APlayer.css",
+            archive          : "/css/archive.css",
+            base             : "/css/base.css",
+            clipboard        : "/css/clipboard.css",
+            code             : "/css/code.css",
+            donate           : "/css/donate.css",
+            fancybox         : "/css/jquery.fancybox.css",
+            footer           : "/css/footer.css",
+            iconfont         : "/iconfont/iconfont.css",
+            index            : "/css/index.css",
+            menuBubble       : "/css/menu-bubble.css",
+            mouse            : "/css/mouse.css",
+            page             : "/css/page.css",
+            post             : "/css/post.css",
+            search           : "/css/search.css",
+            tocbot           : "/css/tocbot.css",
+            valine           : "/css/valine.css"
+        },
+
+        Script: {
+            aplayer          : "/js/APlayer.min.js",
+            config           : "/js/require.config.js",
+            index            : "/js/index.js",
+            instantSearch    : "/js/instantsearch.min.js",
+            iscroll          : "/js/iscroll.js",
+            jQuery           : "/js/jquery-3.4.1.min.js",
+            loading          : "/js/loading.js",
+            meting           : "/js/Meting.min.js",
+            require          : "/js/require.min.js"
+        },
+
+        Font: {
+            LongCang    : "/font/LongCang.css",
+            Monda       : "/font/Monda.css",
+            NotoSansSC  : "/font/NotoSansSC.css",
+            NotoSerifSC : "/font/NotoSerifSC.css",
+            Playball    : "/font/Playball.css",
+            PTMono      : "/font/PTMono.css",
+            Roboto      : "/font/Roboto.css",
+            RobotoSlab  : "/font/RobotoSlab.css",
+            Rosario     : "/font/Rosario.css",
+            UbuntuMono  : "/font/UbuntuMono.css"
+        },
+
+        Suffix : {
+            about : "迷途漫漫终有一归"
+        },
+            
+        Theme : {
+            url  : "https://github.com/first19326/Hexo-LiveForCode",
+            name : "Hexo - Live For Code"
+        }  
+    };
+</script>
+    <script type="text/javascript" src="/js/index.js"></script>
+</body>
+</html>
