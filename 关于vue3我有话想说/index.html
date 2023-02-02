@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-siteapp">
     <title>
         
-            更全面的axios封装
+            关于vue3我有话想说
         
     </title>
     <link rel="shortcut icon" href="#"/>
@@ -36,19 +36,19 @@
     <div class="vertical">
         <div class="inner">
             
-                <h1 class="header-subtitle">更全面的axios封装</h1>
+                <h1 class="header-subtitle">关于vue3我有话想说</h1>
                 <div class="header-subinfo">
                     <p class="article-info-text">
                         <span>
-                            <i class="iconfont icon-time"></i> 发表时间：2022-10-20
+                            <i class="iconfont icon-time"></i> 发表时间：2022-09-22
                         </span>
                         
-                            <span id="/2022/10/20/更全面的axios封装/" class="leancloud_visitors" data-flag-title="更全面的axios封装">
+                            <span id="/关于vue3我有话想说/" class="leancloud_visitors" data-flag-title="关于vue3我有话想说">
                                 <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
                             </span>
                         
                         <span>
-                            <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/2022/10/20/更全面的axios封装/"></span>
+                            <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/关于vue3我有话想说/"></span>
                         </span>  
                     </p>
                     
@@ -65,23 +65,78 @@
         <div id="article">
             <div class="toc"></div>
             <div class="article-body">
-                <h1 id="关于axios"><a href="#关于axios" class="headerlink" title="关于axios"></a>关于axios</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Axios 相信对前端工程熟悉的铁汁对它不会感到陌生了，这简直就是前端近年来的一大杀器。它是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中。</p>
-<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><ul>
-<li>从浏览器中创建 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequests</a></li>
-<li>从 node.js 创建 <a target="_blank" rel="noopener" href="http://nodejs.org/api/http.html">http</a> 请求</li>
-<li>支持 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> API</li>
-<li>拦截请求和响应</li>
-<li>转换请求数据和响应数据</li>
-<li>取消请求</li>
-<li>自动转换 JSON 数据</li>
-<li>客户端支持防御 <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">XSRF</a><br>接下来我们就话不多说了，直接开始今天的主题，虽然axios很强，但是单纯的axios并不能满足我们日常的使用，因此很多时候我们都需要对axios进行二次封装，axios又是基于XMLHttpRequests的封装。套娃？yes<h2 id="为啥要封装axios"><a href="#为啥要封装axios" class="headerlink" title="为啥要封装axios"></a>为啥要封装axios</h2>随着项目规模的增大，每次发送请求，都需要设置超时时间、设置请求头、状态码的拦截、token是否携带、根据项目环境判断使用哪个请求，错误处理等等，重复的劳动浪费时间，还会让代码变得冗余，难以维护。那我们要做的有哪些呢？</li>
-<li>POST请求参数序列化</li>
-<li>取消重复请求</li>
-<li>Loading</li>
-<li>判断不同HTTP状态码</li>
-<li>请求自动携带token</li>
-<li>限制同时请求数<br>废话不多说直接上代码 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br></pre></td><td class="code"><pre><span class="line"> let appId = &quot;sdjhb-jdhoo-f265-djbhfj-iui&quot;   //应用识别码，会在每一个url地址上拼接这个属性</span><br><span class="line"></span><br><span class="line">let stayTime = 3000 //设置zarmUI库Toast（轻提示）组件的停留时间</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 设置超时时间和跨域是否允许携带凭证</span><br><span class="line"> */</span><br><span class="line">axios.defaults.timeout = 10000; //10秒</span><br><span class="line">axios.defaults.withCredentials = true;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 设置post请求头</span><br><span class="line"> * application/json;charset=UTF-8   JSON格式</span><br><span class="line"> * application/x-www-form-urlencoded;charset=UTF-8  Form表单格式</span><br><span class="line"> */</span><br><span class="line">axios.defaults.headers[&#x27;Content-Type&#x27;] = &#x27;application/json;charset=UTF-8&#x27;;</span><br><span class="line"></span><br><span class="line">var CancelToken = axios.CancelToken;</span><br><span class="line">let sources = []  // 定义数组用于存储每个ajax请求的取消函数及对应标识</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 请求防抖当一个url地址被请求多次就会取消前一次请求</span><br><span class="line"> */</span><br><span class="line">let removeSource = (config) =&gt; &#123;</span><br><span class="line">    for (let source in sources) &#123;</span><br><span class="line">        // 当多次请求相同时，取消之前的请求</span><br><span class="line">        if (sources[source].umet === config.url + &#x27;&amp;&#x27; + config.method) &#123;</span><br><span class="line">            sources[source].cancel(&quot;取消请求&quot;)</span><br><span class="line">            sources.splice(source, 1)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 请求拦截器</span><br><span class="line"> */</span><br><span class="line">axios.interceptors.request.use(config =&gt; &#123;</span><br><span class="line">    removeSource(config)</span><br><span class="line">    config.cancelToken = new CancelToken((c) =&gt; &#123;</span><br><span class="line">        // 将取消函数存起来</span><br><span class="line">        sources.push(&#123; umet: config.url + &#x27;&amp;&#x27; + config.method, cancel: c &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    return config;</span><br><span class="line">&#125;, error =&gt; &#123;</span><br><span class="line">    return Promise.reject(error)</span><br><span class="line">&#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// 响应拦截器</span><br><span class="line">axios.interceptors.response.use(config =&gt; &#123;</span><br><span class="line">    if (config.data.statusCode &gt;= 3000) &#123;</span><br><span class="line">        Toast.show(&#123; content: config.data.msg, stayTime &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    removeSource(config.config)</span><br><span class="line"></span><br><span class="line">    return config.data;</span><br><span class="line">&#125;, error =&gt; &#123;</span><br><span class="line">    if (!error.response) return</span><br><span class="line">    switch (error.response.status) &#123;</span><br><span class="line">        // 401: 未登录</span><br><span class="line">        // 未登录则跳转登录页面，并携带当前页面的路径</span><br><span class="line">        // 在登录成功后返回当前页面，这一步需要在登录页操作。                </span><br><span class="line">        case 401:</span><br><span class="line">            if (window.location.hostname === &quot;localhost&quot;) &#123;</span><br><span class="line">                axios.post(&quot;/api/v1/login?client_name=form&quot;, &#123;</span><br><span class="line">                    &quot;userName&quot;: &quot;lixiaoyao4_vendor&quot;,</span><br><span class="line">                    &quot;password&quot;: 123456</span><br><span class="line">                &#125;)</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                window.location = error.response.headers.locationurl;</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        // 403 token过期</span><br><span class="line">        // 登录过期对用户进行提示</span><br><span class="line">        // 清除本地token和清空vuex中token对象</span><br><span class="line">        // 跳转登录页面                </span><br><span class="line">        case 403:</span><br><span class="line">            Toast.show(&#123; content: &quot;登录过期，请重新登录&quot;, stayTime &#125;)</span><br><span class="line">            // 跳转登录页面，并将要浏览的页面fullPath传过去，登录成功后跳转需要访问的页面 </span><br><span class="line">            if (window.location.hostname === &quot;localhost&quot;) &#123;</span><br><span class="line">                axios.post(&quot;/api/v1/login?client_name=form&quot;, &#123;</span><br><span class="line">                    &quot;userName&quot;: &quot;lixiaoyao4_vendor&quot;,</span><br><span class="line">                    &quot;password&quot;: 123456</span><br><span class="line">                &#125;)</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                window.location = error.response.headers.locationurl;</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        // 404请求不存在</span><br><span class="line">        case 404:</span><br><span class="line">            Toast.show(&#123; content: &quot;访问资源不存在&quot;, stayTime &#125;)</span><br><span class="line">            break;</span><br><span class="line">        // 其他错误，直接抛出错误提示</span><br><span class="line">        default:</span><br><span class="line">            Toast.show(&#123; content: error.response.data.message, stayTime &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    return Promise.reject(error.response)</span><br><span class="line">&#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * get方法，对应get请求</span><br><span class="line"> * @param &#123;String&#125; url [请求的url地址]</span><br><span class="line"> * @param &#123;Object&#125; params [请求时携带的参数]</span><br><span class="line"> */</span><br><span class="line">function get(url, params) &#123;</span><br><span class="line">    return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">        axios.get(url, &#123;</span><br><span class="line">            params: &#123;</span><br><span class="line">                ...params,</span><br><span class="line">                appId</span><br><span class="line">            &#125;,</span><br><span class="line">        &#125;).then(res =&gt; &#123;</span><br><span class="line">            resolve(res);</span><br><span class="line">        &#125;).catch(err =&gt; &#123;</span><br><span class="line">            reject(err.data)</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * post方法，对应post请求</span><br><span class="line"> * @param &#123;String&#125; url [请求的url地址]</span><br><span class="line"> * @param &#123;Object&#125; params [请求时携带的参数]</span><br><span class="line"> */</span><br><span class="line">function post(url, params) &#123;</span><br><span class="line">    if (url.indexOf(&quot;?&quot;) === -1) &#123;</span><br><span class="line">        url += `?appId=$&#123;appId&#125;`</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        url += `&amp;appId=$&#123;appId&#125;`</span><br><span class="line">    &#125;</span><br><span class="line">    return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">        axios.post(`$&#123;url&#125;`, params)</span><br><span class="line">            .then(res =&gt; &#123;</span><br><span class="line">                resolve(res);</span><br><span class="line">            &#125;)</span><br><span class="line">            .catch(err =&gt; &#123;</span><br><span class="line">                reject(err)</span><br><span class="line">            &#125;)</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 对外暴露</span><br><span class="line">export &#123; post, get &#125;</span><br></pre></td></tr></table></figure></li>
+                <p>　　在性能方面，对比Vue2.x，性能提升了1.3~2倍左右；打包后的体积也更小了，如果单单写一个HelloWorld进行打包，只有13.5kb；加上所有运行时特性，也不过22.5kb。<br>　　那么作为终端用户的我们，在开发时，和Vue2.x有什么不同呢？Talk is cheap，我们还是来看代码。</p>
+<h3 id="Tree-shaking"><a href="#Tree-shaking" class="headerlink" title="Tree-shaking"></a>Tree-shaking</h3><p>　　Vue3最重要的变化之一就是引入了Tree-Shaking，Tree-Shaking带来的bundle体积更小是显而易见的。在2.x版本中，很多函数都挂载在全局Vue对象上，比如nextTick、nextTick、nextTick、set等函数，因此虽然我们可能用不到，但打包时只要引入了vue这些全局函数仍然会打包进bundle中。<br>　　而在Vue3中，所有的API都通过ES6模块化的方式引入，这样就能让webpack或rollup等打包工具在打包时对没有用到API进行剔除，最小化bundle体积；我们在main.js中就能发现这样的变化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//src/main.js</span><br><span class="line">import &#123; createApp &#125; from &quot;vue&quot;;</span><br><span class="line">import App from &quot;./App.vue&quot;;</span><br><span class="line">import router from &quot;./router&quot;;</span><br><span class="line"></span><br><span class="line">const app = createApp(App);</span><br><span class="line">app.use(router).mount(&quot;#app&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>　　创建app实例方式从原来的newVue()变为通过createApp函数进行创建；不过一些核心的功能比如virtualDOM更新算法和响应式系统无论如何都是会被打包的；这样带来的变化就是以前在全局配置的组件（Vue.component）、指令（Vue.directive）、混入（Vue.mixin）和插件（Vue.use）等变为直接挂载在实例上的方法；我们通过创建的实例来调用，带来的好处就是一个应用可以有多个Vue实例，不同实例之间的配置也不会相互影响：
+　　</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">const app = createApp(App)</span><br><span class="line">app.use(/* ... */)</span><br><span class="line">app.mixin(/* ... */)</span><br><span class="line">app.component(/* ... */)</span><br><span class="line">app.directive(/* ... */)</span><br></pre></td></tr></table></figure>
+
+<p>因此Vue2.x的以下全局API也需要改为ES6模块化引入：</p>
+<ul>
+<li>Vue.nextTick</li>
+<li>Vue.observable不再支持，改为reactive</li>
+<li>Vue.version</li>
+<li>Vue.compile (仅全构建)</li>
+<li>Vue.set (仅兼容构建)</li>
+<li>Vue.delete (仅兼容构建)</li>
 </ul>
+<p>　　除此之外，vuex和vue-router也都使用了Tree-Shaking进行了改进，不过api的语法改动不大：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//src/store/index.js</span><br><span class="line">import &#123; createStore &#125; from &quot;vuex&quot;;</span><br><span class="line"></span><br><span class="line">export default createStore(&#123;</span><br><span class="line">  state: &#123;&#125;,</span><br><span class="line">  mutations: &#123;&#125;,</span><br><span class="line">  actions: &#123;&#125;,</span><br><span class="line">  modules: &#123;&#125;,</span><br><span class="line">&#125;);</span><br><span class="line">//src/router/index.js</span><br><span class="line">import &#123; createRouter, createWebHistory &#125; from &quot;vue-router&quot;;</span><br><span class="line"></span><br><span class="line">const router = createRouter(&#123;</span><br><span class="line">  history: createWebHistory(process.env.BASE_URL),</span><br><span class="line">  routes,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="生命周期函数"><a href="#生命周期函数" class="headerlink" title="生命周期函数"></a>生命周期函数</h3><p>　　我们都知道，在Vue2.x中有8个生命周期函数：</p>
+<ul>
+<li>beforeCreate</li>
+<li>created</li>
+<li>beforeMount</li>
+<li>mounted</li>
+<li>beforeUpdate</li>
+<li>updated</li>
+<li>beforeDestroy</li>
+<li>destroyed</li>
+</ul>
+<p>　　在vue3中，新增了一个setup生命周期函数，setup执行的时机是在beforeCreate生命函数之前执行，因此在这个函数中是不能通过this来获取实例的；同时为了命名的统一，将beforeDestroy改名为beforeUnmount，destroyed改名为unmounted，因此vue3有以下生命周期函数：</p>
+<ul>
+<li>beforeCreate（建议使用setup代替）</li>
+<li>created（建议使用setup代替）</li>
+<li>setup</li>
+<li>beforeMount</li>
+<li>mounted</li>
+<li>beforeUpdate</li>
+<li>updated</li>
+<li>beforeUnmount</li>
+<li>unmounted</li>
+</ul>
+<p>　　同时，vue3新增了生命周期钩子，我们可以通过在生命周期函数前加on来访问组件的生命周期，我们可以使用以下生命周期钩子：</p>
+<ul>
+<li>onBeforeMount</li>
+<li>onMounted</li>
+<li>onBeforeUpdate</li>
+<li>onUpdated</li>
+<li>onBeforeUnmount</li>
+<li>onUnmounted</li>
+<li>onErrorCaptured</li>
+<li>onRenderTracked</li>
+<li>onRenderTriggered</li>
+</ul>
+<p>　　那么这些钩子函数如何来进行调用呢？我们在setup中挂载生命周期钩子，当执行到对应的生命周期时，就调用对应的钩子函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import &#123; onBeforeMount, onMounted &#125; from &quot;vue&quot;;</span><br><span class="line">export default &#123;</span><br><span class="line">  setup() &#123;</span><br><span class="line">    console.log(&quot;----setup----&quot;);</span><br><span class="line">    onBeforeMount(() =&gt; &#123;</span><br><span class="line">      // beforeMount代码执行</span><br><span class="line">    &#125;);</span><br><span class="line">    onMounted(() =&gt; &#123;</span><br><span class="line">      // mounted代码执行</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="响应式API"><a href="#响应式API" class="headerlink" title="响应式API"></a>响应式API</h3><p>我们在深入学习Object.defineProperty和Proxy讲解过Proxy优点以及Vue3为什么改用Proxy实现响应式，同时Vue3也将一些响应式的API进行抽离，以便代码更好的复用。<br>　　我们可以使用reactive来为JS对象创建响应式状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import &#123; reactive, toRefs &#125; from &quot;vue&quot;;</span><br><span class="line">const user = reactive(&#123;</span><br><span class="line">  name: &#x27;Vue2&#x27;,</span><br><span class="line">  age: 18,</span><br><span class="line">&#125;);</span><br><span class="line">user.name = &#x27;Vue3&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>reactive函数只接收object和array等复杂数据类型。</p>
+</blockquote>
+<p>对于一些基本数据类型，比如字符串和数值等，我们想要让它变成响应式，我们当然也可以通过reactive函数创建对象的方式，但是Vue3提供了另一个函数ref：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import &#123; ref &#125; from &quot;vue&quot;;</span><br><span class="line">const num = ref(0);</span><br><span class="line">const str = ref(&quot;&quot;);</span><br><span class="line">const male = ref(true);</span><br><span class="line"></span><br><span class="line">num.value++;</span><br><span class="line">console.log(num.value);</span><br><span class="line"></span><br><span class="line">str.value = &quot;new val&quot;;</span><br><span class="line">console.log(str.value);</span><br><span class="line"></span><br><span class="line">male.value = false;</span><br><span class="line">console.log(male.value);</span><br></pre></td></tr></table></figure>
+
+
+<p>ref返回的响应式对象是只包含一个名为value参数的RefImpl对象，在js中获取和修改都是通过它的value属性；但是在模板中被渲染时，自动展开内部的值，因此不需要在模板中追加.value。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;span&gt;&#123;&#123; count &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;button @click=&quot;count ++&quot;&gt;Increment count&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">  import &#123; ref &#125; from &#x27;vue&#x27;</span><br><span class="line">  export default &#123;</span><br><span class="line">    setup() &#123;</span><br><span class="line">      const count = ref(0)</span><br><span class="line">      return &#123;</span><br><span class="line">        count</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
 
                 
                 <p class="end">__END__</p>
@@ -94,7 +149,7 @@
     <div class="suffix-box-right">
         <span class="suffix-box-title">文章作者：</span>edward
         <br>
-        <span class="suffix-box-title">文章出处：</span><a href="/2022/10/20/%E6%9B%B4%E5%85%A8%E9%9D%A2%E7%9A%84axios%E5%B0%81%E8%A3%85/" target="_blank">更全面的axios封装</a>
+        <span class="suffix-box-title">文章出处：</span><a href="/%E5%85%B3%E4%BA%8Evue3%E6%88%91%E6%9C%89%E8%AF%9D%E6%83%B3%E8%AF%B4/" target="_blank">关于vue3我有话想说</a>
         <br>
         <span class="suffix-box-title">作者签名：</span>迷途漫漫终有一归
         <br>
@@ -109,11 +164,9 @@
                 
                 <div class="article-prev-next">
                     
-                        <a href="/2023/01/29/%E8%84%9A%E6%89%8B%E6%9E%B6%E6%90%AD%E5%BB%BA/" class="prev-prefix">« </a> 上一篇：    <a href="/2023/01/29/%E8%84%9A%E6%89%8B%E6%9E%B6%E6%90%AD%E5%BB%BA/" title="发布于 2023-01-29 03:28">脚手架搭建</a>
+                        <a href="/tree-shaking%E8%AF%A6%E8%A7%A3/" class="prev-prefix">« </a> 上一篇：    <a href="/tree-shaking%E8%AF%A6%E8%A7%A3/" title="发布于 2022-10-17 03:46">tree-shaking详解</a>
                         <br>
                     
-                    
-                        <a href="/2022/10/17/tree-shaking%E8%AF%A6%E8%A7%A3/" class="next-prefix">» </a> 下一篇：    <a href="/2022/10/17/tree-shaking%E8%AF%A6%E8%A7%A3/" title="发布于 2022-10-17 03:46">tree-shaking详解</a>
                     
                 </div>
             </div>
