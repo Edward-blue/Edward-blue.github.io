@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="referrer" content="origin">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>
+        
+            如何提高前端代码健壮性
+        
+    </title>
+    <link rel="shortcut icon" href="#"/>
+
+    <link type="text/css" rel="stylesheet" href="/font/LongCang.css">
+    <link type="text/css" rel="stylesheet" href="/font/Monda.css">
+    <link type="text/css" rel="stylesheet" href="/font/NotoSansSC.css">
+    <link type="text/css" rel="stylesheet" href="/font/NotoSerifSC.css">
+    <link type="text/css" rel="stylesheet" href="/font/Playball.css">
+    <link type="text/css" rel="stylesheet" href="/font/PTMono.css">
+    <link type="text/css" rel="stylesheet" href="/font/Roboto.css">
+    <link type="text/css" rel="stylesheet" href="/font/RobotoSlab.css">
+    <link type="text/css" rel="stylesheet" href="/font/Rosario.css">
+    <link type="text/css" rel="stylesheet" href="/font/UbuntuMono.css">
+
+    <link type="text/css" rel="stylesheet" href="/css/base.css">
+    <link type="text/css" rel="stylesheet" href="/css/code.css">
+
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+<meta name="generator" content="Hexo 6.0.0"></head>
+<body>
+    <a id="cover"></a>
+    <link type="text/css" rel="stylesheet" href="/css/post.css">
+<div id="header" class="header">
+    <div class="vertical">
+        <div class="inner">
+            
+                <h1 class="header-subtitle">如何提高前端代码健壮性</h1>
+                <div class="header-subinfo">
+                    <p class="article-info-text">
+                        <span>
+                            <i class="iconfont icon-time"></i> 发表时间：2023-06-16
+                        </span>
+                        
+                            <span id="/如何提高前端代码健壮性/" class="leancloud_visitors" data-flag-title="如何提高前端代码健壮性">
+                                <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
+                            </span>
+                        
+                        <span>
+                            <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/如何提高前端代码健壮性/"></span>
+                        </span>  
+                    </p>
+                    
+                    
+                </div>
+            
+        </div>
+    </div>
+    
+</div>
+<div id="container">
+    
+        <!-- 文章页面 -->
+        <div id="article">
+            <div class="toc"></div>
+            <div class="article-body">
+                <p>在经历了各种奇葩BUG，各种奇葩问题以及各种兼容处理后，我深刻的认识到代码健壮性是一个提高工作效率以及生活质量的重要指标</p>
+<p>本文旨在帮助提高JAVAScript的健壮性</p>
+<p>更安全地访问对象<br>不要相信接口数据<br>不要相信前端传的参数，也不要信任后台返回的数据<br>比如某个api&#x2F;xxx&#x2F;list的接口，按照文档的约定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    code: 0,</span><br><span class="line">    msg: &quot;&quot;,</span><br><span class="line">    data: [</span><br><span class="line">     // ... 具体数据</span><br><span class="line">    ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>前端代码可能就会写成</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const &#123;code, msg, data&#125; = await fetchList()</span><br><span class="line">data.forEach(()=&gt;&#123;&#125;)</span><br></pre></td></tr></table></figure>
+<p>因为我们假设了后台返回的data是一个数组，所以直接使用了data.forEach，如果在联调的时候遗漏了一些异常情况</p>
+<p>预期在没有数据时data会返回[]空数组，但后台的实现却是不返回data字段<br>后续接口更新，data从数组变成了一个字典，跟前端同步不及时</p>
+<p>这些时候，使用data.forEach时就会报错，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Uncaught TypeError: data.forEach is not a function</span><br></pre></td></tr></table></figure>
+<p>所以在这些直接使用后台接口返回值的地方，最好添加类型检测</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Array.isArray(data) &amp;&amp; data.forEach(()=&gt;&#123;&#125;)</span><br></pre></td></tr></table></figure>
+<p>同理，后台在处理前端请求参数时，也应当进行相关的类型检测。</p>
+<p>空值合并运算符<br>由于JavaScript动态特性，我们在查询对象某个属性时如x.y.z，最好检测一下x和y是否存在</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let z = x &amp;&amp; x.y &amp;&amp; x.y.z</span><br></pre></td></tr></table></figure>
+<p>经常这么写就显得十分麻烦，dart中安全访问对象属性就简单得多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var z = a?.y?.z;</span><br></pre></td></tr></table></figure>
+<p>在ES2020中提出了空值合并运算符的草案，包括??和?.运算符，可以实现与dart相同的安全访问对象属性的功能。目前打开最新版Chrome就可以进行测试了</p>
+<p>在此之前，我们可以封装一个安全获取对象属性的方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">function getObjectValueByKeyStr(obj, key, defaultVal = undefined) &#123;</span><br><span class="line">    if (!key) return defaultVal;</span><br><span class="line">    let namespace = key.toString().split(&quot;.&quot;);</span><br><span class="line">    let value,</span><br><span class="line">        i = 0,</span><br><span class="line">        len = namespace.length;</span><br><span class="line">    for (; i &lt; len; i++) &#123;</span><br><span class="line">        value = obj[namespace[i]];</span><br><span class="line">        if (value === undefined || value === null) return defaultVal;</span><br><span class="line">        obj = value;</span><br><span class="line">    &#125;</span><br><span class="line">    return value;</span><br><span class="line">&#125;</span><br><span class="line">var x = &#123; y: &#123; z: 100,&#125;,&#125;;</span><br><span class="line"></span><br><span class="line">var val = getObjectValueByKeyStr(x, &quot;y.z&quot;);</span><br><span class="line">// var val = getObjectValueByKeyStr(x, &quot;zz&quot;);</span><br><span class="line">console.log(val);</span><br></pre></td></tr></table></figure>
+<p>前端不可避免地要跟各种各种浏览器、各种设备打交道，一个非常重要的问题就是兼容性，尤其是目前我们已经习惯了使用ES2015的特性来开发代码，polyfill可以帮助解决我们大部分问题。<br>记得异常处理<br>参考：<br>JS错误处理 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">MDN</a></p>
+<p>异常处理是代码健壮性的首要保障，关于异常处理有两个方面</p>
+<p>合适的错误处理可以提要用户体验，在代码出错时优雅地提示用户<br>将错误处理进行封装，可以减少开发量，将错误处理与代码解耦</p>
+<p>错误对象<br>可以通过throw语句抛出一个自定义错误对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">// Create an object type UserException</span><br><span class="line">function UserException (message)&#123;</span><br><span class="line">  // 包含message和name两个属性</span><br><span class="line">  this.message=message;</span><br><span class="line">  this.name=&quot;UserException&quot;;</span><br><span class="line">&#125;</span><br><span class="line">// 覆盖默认[object Object]的toString</span><br><span class="line">UserException.prototype.toString = function ()&#123;</span><br><span class="line">  return this.name + &#x27;: &quot;&#x27; + this.message + &#x27;&quot;&#x27;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 抛出自定义错误</span><br><span class="line">function f()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        throw new UserException(&quot;Value too high&quot;);</span><br><span class="line">    &#125;catch(e)&#123;</span><br><span class="line">        if(e instanceof UserException)&#123;</span><br><span class="line">            console.log(&#x27;catch UserException&#x27;)</span><br><span class="line">            console.log(e)</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            console.log(&#x27;unknown error&#x27;)</span><br><span class="line">            throw e</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;finally&#123;</span><br><span class="line">        // 可以做一些退出操作，如关闭文件、关闭loading等状态重置</span><br><span class="line">        console.log(&#x27;done&#x27;)</span><br><span class="line">        return 1000 // 如果finally中return了值，那么会覆盖前面try或catch中的返回值或异常</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">f()</span><br></pre></td></tr></table></figure>
+<p>同步代码<br>对于同步代码，可以使用通过责任链模式封装错误，即当前函数如果可以处理错误，则在catch中进行处理：如果不能处理对应错误，则重新将catch抛到上一层</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">function a()&#123;</span><br><span class="line">    throw &#x27;error b&#x27;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当b能够处理异常时，则不再向上抛出</span><br><span class="line">function b()&#123;</span><br><span class="line">    try&#123;</span><br><span class="line">        a()</span><br><span class="line">    &#125;catch(e)&#123;</span><br><span class="line">        if(e === &#x27;error b&#x27;)&#123;</span><br><span class="line">            console.log(&#x27;由b处理&#x27;)</span><br><span class="line">        &#125;else &#123;</span><br><span class="line">            throw e</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function main()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        b()</span><br><span class="line">    &#125;catch(e)&#123;</span><br><span class="line">        console.log(&#x27;顶层catch&#x27;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>异步代码<br>由于catch无法获取异步代码中抛出的异常，为了实现责任链，需要把异常处理通过回调函数的方式传递给异步任务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">function a(errorHandler) &#123;</span><br><span class="line">    let error = new Error(&quot;error a&quot;);</span><br><span class="line">    if (errorHandler) &#123;</span><br><span class="line">        errorHandler(error);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        throw error;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function b(errorHandler) &#123;</span><br><span class="line">    let handler = e =&gt; &#123;</span><br><span class="line">        if (e === &quot;error b&quot;) &#123;</span><br><span class="line">            console.log(&quot;由b处理&quot;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            errorHandler(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    setTimeout(() =&gt; &#123;</span><br><span class="line">        a(handler);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let globalHandler = e =&gt; &#123;</span><br><span class="line">    console.log(e);</span><br><span class="line">&#125;;</span><br><span class="line">b(globalHandler);</span><br></pre></td></tr></table></figure>
+<p>Prmise的异常处理<br>Promise只包含三种状态：pending、rejected和fulfilled<br>let promise2 &#x3D; promise1.then(onFulfilled, onRejected)<br>下面是promise抛出异常的几条规则</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">function case1()&#123;</span><br><span class="line">    // 如果promise1是rejected态的，但是onRejected返回了一个值（包括undifined），那么promise2还是fulfilled态的，这个过程相当于catch到异常，并将它处理掉，所以不需要向上抛出。</span><br><span class="line">    var p1 = new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        throw &#x27;p1 error&#x27;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    p1.then((res)=&gt;&#123;</span><br><span class="line">        return 1</span><br><span class="line">    &#125;, (e)=&gt;&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">        return 2</span><br><span class="line">    &#125;).then((a)=&gt;&#123;</span><br><span class="line">        // 如果注册了onReject，则不会影响后面Promise执行</span><br><span class="line">        console.log(a) // 收到的是2</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line">function case2()&#123;</span><br><span class="line">    //  在promise1的onRejected中处理了p1的异常，但是又抛出了一个新异常，，那么promise2的onRejected会抛出这个异常</span><br><span class="line">    var p1 = new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        throw &#x27;p1 error&#x27;</span><br><span class="line">    &#125;)</span><br><span class="line">    p1.then((res)=&gt;&#123;</span><br><span class="line">        return 1</span><br><span class="line">    &#125;, (e)=&gt;&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">        throw &#x27;error in p1 onReject&#x27;</span><br><span class="line">    &#125;).then((a)=&gt;&#123;&#125;, (e)=&gt;&#123;</span><br><span class="line">        // 如果p1的 onReject 抛出了异常</span><br><span class="line">        console.log(e)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function case3()&#123;</span><br><span class="line">    // 如果promise1是rejected态的，并且没有定义onRejected，则promise2也会是rejected态的。</span><br><span class="line">    var p1 = new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        throw &#x27;p1 error&#x27;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    p1.then((res)=&gt;&#123;</span><br><span class="line">        return 1</span><br><span class="line">    &#125;).then((a)=&gt;&#123;</span><br><span class="line">        console.log(&#x27;not run:&#x27;, a)</span><br><span class="line">    &#125;, (e)=&gt;&#123;</span><br><span class="line">        // 如果p1的 onReject 抛出了异常</span><br><span class="line">        console.log(&#x27;handle p2:&#x27;, e)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line">function case4()&#123;</span><br><span class="line">    // // 如果promise1是fulfilled态但是onFulfilled和onRejected出现了异常，promise2也会是rejected态的，并且会获得promise1的被拒绝原因或异常。</span><br><span class="line">    var p1 = new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        resolve(1)</span><br><span class="line">    &#125;)</span><br><span class="line">    p1.then((res)=&gt;&#123;</span><br><span class="line">        console.log(res)</span><br><span class="line">        throw &#x27;p1 onFull error&#x27;</span><br><span class="line">    &#125;).then(()=&gt;&#123;&#125;, (e)=&gt;&#123;</span><br><span class="line">        console.log(&#x27;handle p2:&#x27;, e)</span><br><span class="line">        return 123</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因此，我们可以在onRejected中处理当前promise的错误，如果不能，，就把他抛给下一个promise<br>async<br>async&#x2F;await本质上是promise的语法糖，因此也可以使用promise.catch类似的捕获机制</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">function sleep(cb, cb2 =()=&gt;&#123;&#125;,ms = 100) &#123;</span><br><span class="line">    cb2()</span><br><span class="line">    return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">        setTimeout(() =&gt; &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                cb();</span><br><span class="line">                resolve();</span><br><span class="line">            &#125;catch(e)&#123;</span><br><span class="line">                reject(e)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, ms);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">// 通过promise.catch来捕获</span><br><span class="line">async function case1() &#123;</span><br><span class="line">    await sleep(() =&gt; &#123;</span><br><span class="line">        throw &quot;sleep reject error&quot;;</span><br><span class="line">    &#125;).catch(e =&gt; &#123;</span><br><span class="line">        console.log(e);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">// 通过try...catch捕获</span><br><span class="line">async function case2() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        await sleep(() =&gt; &#123;</span><br><span class="line">            throw &quot;sleep reject error&quot;;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125; catch (e) &#123;</span><br><span class="line">        console.log(&quot;catch:&quot;, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// 如果是未被reject抛出的错误，则无法被捕获</span><br><span class="line">async function case3() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        await sleep(()=&gt;&#123;&#125;, () =&gt; &#123;</span><br><span class="line">            // 抛出一个未被promise reject的错误</span><br><span class="line">            throw &#x27;no reject error&#x27;</span><br><span class="line">        &#125;).catch((e)=&gt;&#123;</span><br><span class="line">            console.log(&#x27;cannot catch:&#x27;, e)</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125; catch (e) &#123;</span><br><span class="line">        console.log(&quot;catch:&quot;, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>更稳定的第三方模块<br>在实现一些比较小功能的时候，比如日期格式化等，我们可能并不习惯从npm找一个成熟的库，而是自己顺手写一个功能包，由于开发时间或者测试用例不足，当遇见一些未考虑的边界条件，就容易出现BUG。<br>这也是npm上往往会出现一些很小的模块，比如这个判断是否为奇数的包：isOdd，周下载量居然是60来万。</p>
+<p>使用一些比较成熟的库，一个很重要原因是，这些库往往经过了大量的测试用例和社区的考验，肯定比我们顺手些的工具代码更安全。<br>一个亲身经历的例子是：根据UA判断用户当前访问设备，正常思路是通过正则进行匹配</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">export function getOSType() &#123;</span><br><span class="line">  const ua = navigator.userAgent</span><br><span class="line"></span><br><span class="line">  const isWindowsPhone = /(?:Windows Phone)/.test(ua)</span><br><span class="line">  const isSymbian = /(?:SymbianOS)/.test(ua) || isWindowsPhone</span><br><span class="line">  const isAndroid = /(?:Android)/.test(ua)</span><br><span class="line"></span><br><span class="line">  // 判断是否是平板</span><br><span class="line">  const isTablet =</span><br><span class="line">    /(?:iPad|PlayBook)/.test(ua) ||</span><br><span class="line">    (isAndroid &amp;&amp; !/(?:Mobile)/.test(ua)) ||</span><br><span class="line">    (/(?:Firefox)/.test(ua) &amp;&amp; /(?:Tablet)/.test(ua))</span><br><span class="line"></span><br><span class="line">  // 是否是iphone</span><br><span class="line">  const isIPhone = /(?:iPhone)/.test(ua) &amp;&amp; !isTablet</span><br><span class="line"></span><br><span class="line">  // 是否是pc</span><br><span class="line">  const isPc = !isIPhone &amp;&amp; !isAndroid &amp;&amp; !isSymbian &amp;&amp; !isTablet</span><br><span class="line">  return &#123;</span><br><span class="line">    isIPhone,</span><br><span class="line">    isAndroid,</span><br><span class="line">    isSymbian,</span><br><span class="line">    isTablet,</span><br><span class="line">    isPc</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然在进行模块选择的时候也要进行各种考虑，包括稳定性、旧版本兼容、未解决issue等问题。当选择了一个比较好的工具模块之后，我们就可以将更多的精力放在业务逻辑中。<br>本地配置文件<br>在开发环境下，我们可能需要一些本地的开关配置文件，这些配置只在本地开发时存在，不进入代码库，也不会跟其他同事的配置起冲突。<br>我推崇将mock模板托管到git仓库中，这样可以方便其他同事开发和调试接口，带来的一个问题时本地可能需要一个引入mock文件的开关<br>下面是一个常见的做法：新建一个本地的配置文件config.local.js，然后导出相关配置信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// config.local.js</span><br><span class="line">module.exports = &#123;</span><br><span class="line">  needMock: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>记得在.gitignore中忽略该文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.local.js</span><br></pre></td></tr></table></figure>
+<p>然后通过try…catch…加载该模块，由于文件未进入代码库，在其他地方拉代码更新时会进入catch流程，本地开发则进入正常模块引入流程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// mock/entry.js</span><br><span class="line">try &#123;</span><br><span class="line">  const &#123; needMock &#125; = require(&#x27;./config.local&#x27;)</span><br><span class="line">  if (needMock) &#123;</span><br><span class="line">    require(&#x27;./index&#x27;) // 对应的mock入口</span><br><span class="line">    console.log(&#x27;====start mock api===&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125; catch (e) &#123;</span><br><span class="line">  console.log(&#x27;未引入mock，如需要，请创建/mock/config.local并导出 &#123;needMock: true&#125;&#x27;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后在整个应用的入口文件判断开发环境并引入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (process.env.NODE_ENV === &#x27;development&#x27;) &#123;</span><br><span class="line">  require(&#x27;../mock/entry&#x27;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过这种方式，就可以在本地开发时愉快地进行各种配置，而不必担心忘记在提交代码前注释对应的配置修改~<br>Code Review</p>
+<p>Code Review 是苦涩但有意思的修行</p>
+<p>Code Review应该是是上线前一个必经的步骤，我认为CR主要的作用有</p>
+<p>能够确认需求理解是否出现偏差，避免扯皮</p>
+<p>优化代码质量，包括冗余代码、变量命名和过分封装等，起码除了写代码的人之外还得保证审核的人能看懂相关逻辑</p>
+<p>对于一个需要长期维护迭代的项目而言，每一次commit和merge都是至关重要的，因此在合并代码之前，最好从头检查一遍改动的代码。即使是在比较小的团队或者找不到审核人员，也要把合并认真对待。</p>
+
+                
+                <p class="end">__END__</p>
+            </div>
+            <div class="article-footer">
+                <div class="suffix-box">
+    <div class="suffix-box-left">
+        <img src="/image/sidebar/avatar.jpg" alt="edward">
+    </div>
+    <div class="suffix-box-right">
+        <span class="suffix-box-title">文章作者：</span>edward
+        <br>
+        <span class="suffix-box-title">文章出处：</span><a href="/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%A0%81%E5%81%A5%E5%A3%AE%E6%80%A7/" target="_blank">如何提高前端代码健壮性</a>
+        <br>
+        <span class="suffix-box-title">作者签名：</span>迷途漫漫终有一归
+        <br>
+        <span class="suffix-box-title">关于主题：</span><a href="https://github.com/first19326/Hexo-LiveForCode" target="_blank">Hexo - Live For Code</a>
+        <br>
+        <span class="suffix-box-title">版权声明：</span>文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="BY-NC-SA" target="_blank">BY-NC-SA</a> 许可协议，转载请注明出处
+        <br>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+                
+                
+                <div class="article-prev-next">
+                    
+                        <a href="/%E5%89%8D%E7%AB%AF%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" class="prev-prefix">« </a> 上一篇：    <a href="/%E5%89%8D%E7%AB%AF%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" title="发布于 2023-06-16 03:12">前端奇技淫巧</a>
+                        <br>
+                    
+                    
+                        <a href="/%E8%84%9A%E6%89%8B%E6%9E%B6%E6%90%AD%E5%BB%BA/" class="next-prefix">» </a> 下一篇：    <a href="/%E8%84%9A%E6%89%8B%E6%9E%B6%E6%90%AD%E5%BB%BA/" title="发布于 2023-01-29 03:28">脚手架搭建</a>
+                    
+                </div>
+            </div>
+            
+    <div class="article-comments">
+        
+            <div class="comments-title">
+                评论列表
+            </div>
+        
+        <div class="comments-content"></div>
+    </div>
+
+        </div>
+    
+</div>
+    <div id="footer"></div>
+    <div id="sidebar">
+    <div class="menu-wrap" style="display:none;">
+        
+            <div class="menu-notice">
+                <span class="iconfont icon-notice"></span>
+                <div class="notice">
+                    <span>迷途漫漫终有一归</span>
+                </div>
+            </div>
+        
+        <nav class="menu">
+            <div class="menu-introduce"> 
+                <div class="introduce-avatar">
+                    <img src="/image/sidebar/avatar.jpg">
+                </div> 
+                <div class="introduce-info"> 
+                    <div class="introduce-user"><span>edward</span></div>
+                </div> 
+            </div> 
+            <div class="menu-list">
+                <ul>
+                    
+                        <li class=""><a href="/" class="" target="_self"><span class="iconfont icon-home-fill"></span>首页</a></li>
+                    
+                        <li class=""><a href="/category" class="" target="_self"><span class="iconfont icon-folder-fill"></span>分类</a></li>
+                    
+                        <li class=""><a href="/tag" class="" target="_self"><span class="iconfont icon-discount-fill"></span>标签</a></li>
+                    
+                        <li class=""><a href="/donate" class="" target="_self"><span class="iconfont icon-heart-fill"></span>赞赏</a></li>
+                    
+                        <li class=""><a href="/about" class="" target="_self"><span class="iconfont icon-about-fill"></span>关于</a></li>
+                    
+                        <li class=""><a href="javascript:;" class="search" target="_self"><span class="iconfont icon-search-menu"></span>搜索</a></li>
+                    
+                        <li class=""><a href="/comment" class="" target="_self"><span class="iconfont icon-comments-fill"></span>留言板</a></li>
+                    
+                        <li class=""><a href="/friend" class="" target="_self"><span class="iconfont icon-link"></span>友情链接</a></li>
+                    
+                </ul> 
+            </div> 
+            <div class="menu-link">
+                <div class="box">
+                    <div class="image-box"></div>
+                </div>
+                
+                    <a name="QQ" href="javascript:;" class="image" target="_self" data="/image/sidebar/qq.png"><span class="iconfont icon-qq"></span></a>
+                
+            </div> 
+        </nav>
+        <button class="menu-button-close"></button>
+        <div class="morph-shape" id="morph-shape" data-morph-open="M-7.312,0H15c0,0,66,113.339,66,399.5C81,664.006,15,800,15,800H-7.312V0z;M-7.312,0H100c0,0,0,113.839,0,400c0,264.506,0,400,0,400H-7.312V0z">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 800" preserveAspectRatio="none">
+                <path d="M-7.312,0H0c0,0,0,113.839,0,400c0,264.506,0,400,0,400h-7.312V0z"/>
+            </svg>
+        </div>
+    </div>
+    <button class="menu-button-open">MENU</button>
+    <div class="menu-cover"></div>
+</div>
+    <link type="text/css" rel="stylesheet" href="/css/search.css">
+<script type="text/javascript" src="/js/iscroll.js"></script>
+<script type="text/javascript" src="/js/instantsearch.min.js"></script>
+<div class="search-window">
+    <div class="search-content">
+        <div class="search-content-icon">
+            <i class="iconfont icon-search"></i>
+        </div>
+        <div id="search-input" class="search-input"></div>
+    </div>
+
+    <div class="search-scroll">
+        <div class="search-result">
+            <div id="search-stats" class="search-stats"></div>
+            <div id="search-hits"></div>
+            <div id="search-pagination" class="search-pagination"></div>
+        </div>
+    </div>
+
+    <span class="search-close-icon">
+        <i class="iconfont icon-close"></i>
+    </span>
+</div>
+    <div id="tools">
+    <div class="progressbar-top"></div>
+
+    
+        <link type="text/css" rel="stylesheet" href="/css/APlayer.css">
+        <script type="text/javascript" src="/js/APlayer.min.js"></script>
+        <script type="text/javascript" src="/js/Meting.min.js"></script>
+        <meting-js id="3778678" lrcshow="false" server="netease" type="playlist" fixed="true" autoplay="false" loop="all" order="random" preload="auto" volume="0.67" mutex="true"></meting-js>
+    
+    
+    <div class="wrap-right">
+        <div class="setting">
+            <div class="iconbox favorites" switch="false">
+                <span class="iconfont icon-favorites"></span>
+                <span class="icontext">关注</span>
+            </div>
+            <div class="iconbox mode">
+                <div class="light">
+                    <span class="iconfont icon-daymode"></span>
+                    <span class="icontext">浅色模式</span>
+                </div>
+                <div class="dark">
+                    <span class="iconfont icon-nightmode-fill"></span>
+                    <span class="icontext">深色模式</span>
+                </div>
+            </div>
+            <a href="javascript:;" target="_self" class="search">
+                <div class="iconbox">
+                    <span class="iconfont icon-search-menu"></span>
+                    <span class="icontext">搜索</span>
+                </div>
+            </a>
+            <div class="iconbox bottom">
+                <div style="display: inline-block; transform: rotate(180deg);">
+                    <span class="iconfont icon-top"></span>
+                </div>
+                <span class="icontext">跳至底部</span>
+            </div>
+        </div>
+        <div class="iconbox set">
+            <div style="display: inline-block;">
+                <span class="iconfont icon-setting"></span>
+            </div>
+            <span class="icontext">设置</span>
+        </div>
+        <div class="iconbox top">
+            <span class="iconfont icon-top"></span>
+            <span class="icontext">返回顶部</span>
+        </div>
+    </div>
+    <div class="loading"></div>
+</div>
+    <script>
+    window.config = {
+        GitHubUserName     : "first19326",
+        GitHubRepositories : "Hexo-LiveForCode",
+
+        User             : "edward",
+        UserAvatar       : "/image/sidebar/avatar.jpg",
+        WebsiteStartDate : "2020-01-01",
+
+        WebsiteTitleBlur         : "(◍´꒳`◍) Hi, edward",
+        WebsiteTitleBlurTimeOut  : 500,
+        WebsiteTitleFocus        : "(*´∇｀*) 欢迎回来!",
+        WebsiteTitleFocusTimeOut : 1000,
+        WebsiteFavicon           : "/image/website/logo.png",
+
+        ProgressBar : {
+            id       : "topProgressBar",
+            color    : "#77B6FF",
+            height   : "2px",
+            duration : 0.2
+        },
+
+        Loading: {
+            rebound : {
+                tension  : 16,
+                friction : 5
+            },
+            spinner : {
+                id     : "spinner",
+                radius : 90,
+                sides  : 3,
+                depth  : 4,
+                colors : {
+                    background : "#F0F0F0",
+                    stroke     : "#272633",
+                    base       : "",
+                    child      : "#272633"
+                },
+                alwaysForward : true,
+                restAt        : 0.5,
+                renderBase    : false
+            }
+        },
+
+        HomeHeaderAnimationRendered : true,
+        HomeHeaderAnimation         : {
+            radius      : 15,
+            density     : 0.2,
+            color       : "rgba(255, 255, 255, .2)",
+            clearOffset : 0.3
+        },
+
+        BackAnimationRendered          : true,
+        IEBrowserBackAnimationRendered : false,
+        BackAnimation                  : {
+            colorSaturation  : "60%",
+            colorBrightness  : "50%",
+            colorAlpha       : 0.5,
+            colorCycleSpeed  : 5,
+            verticalPosition : "random",
+            horizontalSpeed  : 200,
+            ribbonCount      : 3,
+            strokeSize       : 0,
+            parallaxAmount   : -0.2,
+            animateSections  : true
+        },
+
+        HomeHeaderImage : [
+            
+                "/image/header/home.jpg",
+            
+                "/image/header/home.jpeg",
+            
+        ],
+        HomeBannerText  : "",
+
+        ArticleHeaderImage : [
+            
+                "/image/header/article.jpg",
+            
+        ],
+
+        OtherBannerText : "",
+
+        Error : {
+            icon    : "icon-swimming",
+            title   : "PAGE NOT FOUND",
+            content : [
+                
+                    "很抱歉，您访问的页面不存在！",
+                
+                    "可能是输入地址有误或该地址已变更。",
+                
+            ],
+            buttons : [
+                
+                    {
+                        icon  : "icon-home",
+                        text  : "返回首页",
+                        href  : "/",
+                        class : ""
+                    },
+                
+            ]
+        },
+
+        MenuNotice : {
+            enable : true,
+            notice : "迷途漫漫终有一归",
+            speed  : 20
+        },
+        MenuList : [
+            
+                {
+                    name   : "首页",
+                    icon   : "icon-home-fill",
+                    href   : "/",
+                    type   : "index",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "分类",
+                    icon   : "icon-folder-fill",
+                    href   : "/category",
+                    type   : "category",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "标签",
+                    icon   : "icon-discount-fill",
+                    href   : "/tag",
+                    type   : "tag",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "赞赏",
+                    icon   : "icon-heart-fill",
+                    href   : "/donate",
+                    type   : "donate",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "关于",
+                    icon   : "icon-about-fill",
+                    href   : "/about",
+                    type   : "about",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "搜索",
+                    icon   : "icon-search-menu",
+                    href   : "javascript:;",
+                    type   : "",
+                    class  : "search",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "留言板",
+                    icon   : "icon-comments-fill",
+                    href   : "/comment",
+                    type   : "comment",
+                    class  : "",
+                    target : "_self"
+                },
+            
+                {
+                    name   : "友情链接",
+                    icon   : "icon-link",
+                    href   : "/friend",
+                    type   : "friend",
+                    class  : "",
+                    target : "_self"
+                },
+            
+        ],
+        MenuLink : [
+            
+                
+                    {
+                        name   : "QQ",
+                        icon   : "icon-qq",
+                        href   : "javascript:;",
+                        class  : "image",
+                        target : "_self",
+                        image  : "/image/sidebar/qq.png"
+                    },
+                
+            
+        ],
+
+        FooterStyle : 2,
+        BottomText  : "<div><span class='face'>ღゝ◡╹)ノ♡</span></div><div>【人生若只如初见<span><i class='iconfont icon-like-fill'></i></span>何事秋风悲画扇】</div><div>&copy; 2020-2022 WorstOne. All Rights Reserved.</div>",
+
+        ConsoleList : [
+            
+                
+                    [
+                        
+                            
+                                "Based on cnblogs theme SimpleMemory.",
+                            
+                                "",
+                            
+                        
+                    ],
+                
+                    [
+                        
+                            
+                                "SimpleMemory Author:",
+                            
+                                "BNDong",
+                            
+                        
+                    ],
+                
+                    [
+                        
+                            
+                                "Theme:",
+                            
+                                "LiveForCode",
+                            
+                        
+                    ],
+                
+            
+        ],
+
+        FontIconExtend : "",
+
+        Donate : {
+            paypal  : "",
+            bitcoin : "",
+            alipay  : "/image/donate/alipay.png",
+            wechat  : "/image/donate/wechat.png"
+        },
+
+        Search : {
+            applicationID : "010C3EANT8",
+            apiKey        : "c7abab9f11b79102b9aff7fe6d41447d",
+            indexName     : "Notes",
+            hits          : {
+                page : 10
+            },
+            labels        : {
+                placeholder : "搜索",
+                empty       : "未发现与 「${query}」 相关的内容",
+                stats       : "${hits} 条相关条目，使用了 ${time} 毫秒",
+            }
+        }, 
+
+        Valine : {
+            switch         : true,
+            el             : ".comments-content",
+            appId          : "srhKtvWPQTWYKh3qX8G8M7v0-gzGzoHsz",
+            appKey         : "8uVSP1q6UlALVC5igYfIfv2h",
+            serverURLs     : "",
+            placeholder    : "你是我一生只会遇见一次的惊喜...",
+            avatar         : "mm",
+            meta           : "nick,mail,link",
+            requiredFields : "nick,mail",
+            pageSize       : 5,
+            lang           : "zh-cn",
+            visitor        : true,
+            enableQQ       : true
+        },
+
+        Tocbot : {
+            switch                : true,
+            tocSelector           : ".toc",
+            contentSelector       : ".article-body",
+            headingSelector       : "h1, h2, h3, h4, h5",
+            headingsOffset        : 0,
+            scrollSmooth          : true,
+            scrollSmoothOffset    : -5,
+            positionFixedSelector : ".toc",
+            positionFixedClass    : "toc-fixed",
+            fixedSidebarOffset    : "",
+        },
+
+        Require : {
+            baseUrl     : "/js/",
+            waitSeconds : 100
+        },
+
+        Music : {
+            type : "Meting"
+        },
+        APlayer : {
+            container : ".aplayer",
+            fixed     : true,
+            autoplay  : false,
+            loop      : "all",
+            order     : "random",
+            preload   : "auto",
+            volume    : 0.67,
+            mutex     : true,
+            lrcType   : 3,
+            audio     : [
+                
+                    {
+                        name   : "Endless Tears",
+                        artist : "CLIFF EDGE",
+                        cover  : "/music/cover/Endless Tears.jpg",
+                        url    : "/music/song/Endless Tears.mp3",
+                        lrc    : "/music/lrc/Endless Tears.lrc"
+                    },
+                
+            ]
+        },
+        Meting : {
+            id       : "3778678", 
+            lrcshow  : false, 
+            server   : "netease", 
+            type     : "playlist", 
+            fixed    : true, 
+            autoplay : false, 
+            loop     : "all", 
+            order    : "random", 
+            preload  : "auto", 
+            volume   : 0.67, 
+            mutex    : true
+        },
+
+        Mouse : {
+            enable  : true,
+            options : {
+                size  : 6,
+                sizeF : 24
+            }
+        },
+
+        LazyLoad : {
+            default : "/image/website/lazyload.svg"
+        },
+  
+        Style : {
+            aplayer          : "/css/APlayer.css",
+            archive          : "/css/archive.css",
+            base             : "/css/base.css",
+            clipboard        : "/css/clipboard.css",
+            code             : "/css/code.css",
+            donate           : "/css/donate.css",
+            fancybox         : "/css/jquery.fancybox.css",
+            footer           : "/css/footer.css",
+            iconfont         : "/iconfont/iconfont.css",
+            index            : "/css/index.css",
+            menuBubble       : "/css/menu-bubble.css",
+            mouse            : "/css/mouse.css",
+            page             : "/css/page.css",
+            post             : "/css/post.css",
+            search           : "/css/search.css",
+            tocbot           : "/css/tocbot.css",
+            valine           : "/css/valine.css"
+        },
+
+        Script: {
+            aplayer          : "/js/APlayer.min.js",
+            config           : "/js/require.config.js",
+            index            : "/js/index.js",
+            instantSearch    : "/js/instantsearch.min.js",
+            iscroll          : "/js/iscroll.js",
+            jQuery           : "/js/jquery-3.4.1.min.js",
+            loading          : "/js/loading.js",
+            meting           : "/js/Meting.min.js",
+            require          : "/js/require.min.js"
+        },
+
+        Font: {
+            LongCang    : "/font/LongCang.css",
+            Monda       : "/font/Monda.css",
+            NotoSansSC  : "/font/NotoSansSC.css",
+            NotoSerifSC : "/font/NotoSerifSC.css",
+            Playball    : "/font/Playball.css",
+            PTMono      : "/font/PTMono.css",
+            Roboto      : "/font/Roboto.css",
+            RobotoSlab  : "/font/RobotoSlab.css",
+            Rosario     : "/font/Rosario.css",
+            UbuntuMono  : "/font/UbuntuMono.css"
+        },
+
+        Suffix : {
+            about : "迷途漫漫终有一归"
+        },
+            
+        Theme : {
+            url  : "https://github.com/first19326/Hexo-LiveForCode",
+            name : "Hexo - Live For Code"
+        }  
+    };
+</script>
+    <script type="text/javascript" src="/js/index.js"></script>
+</body>
+</html>

@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-siteapp">
     <title>
         
-            edward
+            前端奇技淫巧
         
     </title>
     <link rel="shortcut icon" href="#"/>
@@ -31,208 +31,96 @@
 <meta name="generator" content="Hexo 6.0.0"></head>
 <body>
     <a id="cover"></a>
-    <link type="text/css" rel="stylesheet" href="/css/index.css">
-<div id="count"></div>
-<div id="header" >
+    <link type="text/css" rel="stylesheet" href="/css/post.css">
+<div id="header" class="header">
     <div class="vertical">
         <div class="inner">
             
-                <h1 class="header-title">edward</h1>
-                <h2 class="header-description" id="hitokoto"></h2>
-                <h3 class="header-info" id="hitokotoAuthor"></h3>
+                <h1 class="header-subtitle">前端奇技淫巧</h1>
+                <div class="header-subinfo">
+                    <p class="article-info-text">
+                        <span>
+                            <i class="iconfont icon-time"></i> 发表时间：2023-06-16
+                        </span>
+                        
+                            <span id="/前端奇技淫巧/" class="leancloud_visitors" data-flag-title="前端奇技淫巧">
+                                <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
+                            </span>
+                        
+                        <span>
+                            <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/前端奇技淫巧/"></span>
+                        </span>  
+                    </p>
+                    
+                    
+                </div>
             
         </div>
     </div>
     
-        <a class="scroll-down" href="javascript:;" target="_self" data-offset="-45">
-            <i class="scroll-down-icon iconfont icon-return"></i>
-        </a>
-    
 </div>
 <div id="container">
     
-        
-            <!-- 首页 -->
-            <div class="articles">
+        <!-- 文章页面 -->
+        <div id="article">
+            <div class="toc"></div>
+            <div class="article-body">
+                <p>作为i一个合格的前端老油子偷懒是必考科目，如何提高效率，利用最少的时间完成最多的工作，写最少的代码完成最多的功能，下面就整理了几个比较有意思的为前端开发技巧</p>
+<h1 id="icon图标使用"><a href="#icon图标使用" class="headerlink" title="icon图标使用"></a>icon图标使用</h1><h2 id="版本一（mainland版）"><a href="#版本一（mainland版）" class="headerlink" title="版本一（mainland版）"></a>版本一（mainland版）</h2><p>下载svg或者png文件，存放在本地asset静态文件夹下。但是前端童靴应该经常遇到设计师给的图片是有填充的，这就导致我们在页面当中无法自定义颜色，但是问题不大。<br>打开svg进行编辑，去除代码中所有的fill填充然后在svg上添加attr，fill&#x3D;”currentColor”，使用的时候用正常使用字体什么颜色，svg就是什么颜色。<br>这么一说肯定有童靴提出质疑，图标少的时候还行，图标要是多了就不太友好了，代码还没写明白呢，还要出一个个的处理svg图片。所以我们还有更简洁的方法。<br>使用nodejs的SVG文件优化插件，在项目当中下载svgo，并且在package命令中添加脚本<br>“svgo”: “svgo -f src&#x2F;icons&#x2F;svg –config&#x3D;src&#x2F;icons&#x2F;svgo.yml”<br>跑一下命令，在进行使用时，图标就会跟随文本颜色了。</p>
+<h2 id="版本二（singleOnline版）"><a href="#版本二（singleOnline版）" class="headerlink" title="版本二（singleOnline版）"></a>版本二（singleOnline版）</h2><p>在不考虑图标颜色更改，定制化的时候，可以将设计师的给的图标上传oss服务器上，使用图片标签去显示，缺点就是无法自定义颜色，图片要考虑拉伸问题</p>
+<h2 id="版本三（upOnline版）"><a href="#版本三（upOnline版）" class="headerlink" title="版本三（upOnline版）"></a>版本三（upOnline版）</h2><p>使用iconfont阿里图标库，先登录账号，将项目用到的图标上传，上传的时候会帮你去除图标当中的填充，上传时可以选择上传到【我的上传，图标库，项目】这三个地方，建议创建一个项目，上传到对应的项目。根据自己业务需求选择引用方式。</p>
+<h1 id="es6特性"><a href="#es6特性" class="headerlink" title="es6特性"></a>es6特性</h1><h2 id="array"><a href="#array" class="headerlink" title="array"></a>array</h2><h3 id="创建数组并填充"><a href="#创建数组并填充" class="headerlink" title="创建数组并填充"></a>创建数组并填充</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">new Array(2).fill(1)</span><br><span class="line">// [1,1]</span><br><span class="line">new Array(2).fill(&#123;&#125;)</span><br><span class="line">// [&#123;&#125;,&#123;&#125;]</span><br><span class="line">new Array(2).fill(&#123;name:&#x27;古天乐&#x27;&#125;)</span><br><span class="line">// [&#123;name:&#x27;古天乐&#x27;&#125;,&#123;name:&#x27;古天乐&#x27;&#125;]</span><br><span class="line"></span><br><span class="line">// 快速创建1到n的数组</span><br><span class="line">[...new Array(n+1).keys()].slice(1,n+1)</span><br><span class="line">// [1,2,3,4,·····n]</span><br><span class="line">[...new Array(100).keys()].map(i=&gt;i+1)</span><br><span class="line">// [1,2,3,4,·····n]</span><br><span class="line">new Array(100).fill(0).map((i,index)=&gt; index+1)</span><br><span class="line">// [1,2,3,4,·····n]</span><br><span class="line">Array.from(Array(100),(i,index)=&gt;index+1)</span><br><span class="line">// [1,2,3,4,·····n]</span><br></pre></td></tr></table></figure>
+<h3 id="数组求和"><a href="#数组求和" class="headerlink" title="数组求和"></a>数组求和</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[1, 2, 3].reduce(function (sum, current) &#123;</span><br><span class="line">  return sum + current;</span><br><span class="line">&#125;, 0);</span><br><span class="line">// 6</span><br><span class="line"></span><br><span class="line">// 对象数组求和</span><br><span class="line">[&#123;price:1&#125;,&#123;price:2&#125;,&#123;price:3&#125;].reduce(function (sum, current) &#123;</span><br><span class="line">  return sum + current.price;</span><br><span class="line">&#125;, 0);</span><br><span class="line">// 6</span><br></pre></td></tr></table></figure>
+<h3 id="数组排序"><a href="#数组排序" class="headerlink" title="数组排序"></a>数组排序</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[4, 3, 2, 1].sort((a, b) =&gt; a - b)</span><br><span class="line">// [1, 2, 3, 4]</span><br><span class="line">[1, 2, 3, 4].sort((a, b) =&gt; b - a)</span><br><span class="line">// [4, 3, 2, 1]</span><br><span class="line"></span><br><span class="line">// 对象数组排序</span><br><span class="line">[&#123;price:1&#125;,&#123;price:2&#125;,&#123;price:3&#125;].sort((a, b) =&gt; a.price - b.price)</span><br><span class="line">// [&#123;price:1&#125;,&#123;price:2&#125;,&#123;price:3&#125;]</span><br><span class="line">[&#123;price:1&#125;,&#123;price:2&#125;,&#123;price:3&#125;].sort((a, b) =&gt; b.price - a.price)</span><br><span class="line">// [&#123;price:3&#125;,&#123;price:2&#125;,&#123;price:1&#125;]</span><br><span class="line">// 其他排序 https://sort.hust.cc/2.selectionsort#3.-javascript-dai-ma-shi-xian</span><br></pre></td></tr></table></figure>
+<h3 id="数组最大值"><a href="#数组最大值" class="headerlink" title="数组最大值"></a>数组最大值</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Math.max(...[1, 2, 3, 4]) </span><br><span class="line">// 4</span><br><span class="line">Math.max.apply(this, [1, 2, 3, 4]) </span><br><span class="line">// 4</span><br><span class="line">[1, 2, 3, 4].reduce( (prev, cur,curIndex,arr)=&gt; &#123;</span><br><span class="line">    return Math.max(prev,cur);</span><br><span class="line">&#125;,0) // 4</span><br></pre></td></tr></table></figure>
+
+<h3 id="类数组转数组"><a href="#类数组转数组" class="headerlink" title="类数组转数组"></a>类数组转数组</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Array.from(&#123; 0: &#x27;aaa&#x27;, &#x27;1&#x27;: &#x27;bbb&#x27;, &#x27;二&#x27;: &#x27;ccc&#x27;, 4: &#x27;eee&#x27;, length: 6 &#125;)</span><br><span class="line">// [&#x27;aaa&#x27;, &#x27;bbb&#x27;, undefined, undefined, &#x27;eee&#x27;, undefined] </span><br></pre></td></tr></table></figure>
+<h3 id="数组转对象"><a href="#数组转对象" class="headerlink" title="数组转对象"></a>数组转对象</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123; ...[&#x27;aaa&#x27;, &#x27;bbbb&#x27;, &#x27;cccc&#x27;, &#x27;dddd&#x27;] &#125;</span><br><span class="line">// &#123;0: &#x27;aaa&#x27;, 1: &#x27;bbbb&#x27;, 2: &#x27;cccc&#x27;, 3: &#x27;dddd&#x27;&#125;</span><br><span class="line">Object.keys(&#123;name:&#x27;张三&#x27;,age:14&#125;) // [&#x27;name&#x27;,&#x27;age&#x27;]</span><br><span class="line">Object.values(&#123;name:&#x27;张三&#x27;,age:14&#125;) // [&#x27;张三&#x27;,14]</span><br><span class="line">Object.entries(&#123;name:&#x27;张三&#x27;,age:14&#125;) // [[name,&#x27;张三&#x27;],[age,14]]</span><br><span class="line">Object.fromEntries([name,&#x27;张三&#x27;],[age,14]) // ES10的api,Chrome不支持, firebox输出&#123;name:&#x27;张三&#x27;,age:14&#125;</span><br></pre></td></tr></table></figure>
                 
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96%E5%BC%80%E5%8F%91%E6%8E%A2%E7%B4%A2/">前端模块化开发探索</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-06-16
-                            </span>
-                            
-                                <span id="/前端模块化开发探索/" class="leancloud_visitors" data-flag-title="前端模块化开发探索">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/前端模块化开发探索/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
+                <p class="end">__END__</p>
+            </div>
+            <div class="article-footer">
+                <div class="suffix-box">
+    <div class="suffix-box-left">
+        <img src="/image/sidebar/avatar.jpg" alt="edward">
+    </div>
+    <div class="suffix-box-right">
+        <span class="suffix-box-title">文章作者：</span>edward
+        <br>
+        <span class="suffix-box-title">文章出处：</span><a href="/%E5%89%8D%E7%AB%AF%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" target="_blank">前端奇技淫巧</a>
+        <br>
+        <span class="suffix-box-title">作者签名：</span>迷途漫漫终有一归
+        <br>
+        <span class="suffix-box-title">关于主题：</span><a href="https://github.com/first19326/Hexo-LiveForCode" target="_blank">Hexo - Live For Code</a>
+        <br>
+        <span class="suffix-box-title">版权声明：</span>文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="BY-NC-SA" target="_blank">BY-NC-SA</a> 许可协议，转载请注明出处
+        <br>
+    </div>
+    <div style="clear: both;"></div>
+</div>
                 
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%89%8D%E7%AB%AF%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/">前端奇技淫巧</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-06-16
-                            </span>
-                            
-                                <span id="/前端奇技淫巧/" class="leancloud_visitors" data-flag-title="前端奇技淫巧">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/前端奇技淫巧/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
                 
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%A0%81%E5%81%A5%E5%A3%AE%E6%80%A7/">如何提高前端代码健壮性</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-06-16
-                            </span>
-                            
-                                <span id="/如何提高前端代码健壮性/" class="leancloud_visitors" data-flag-title="如何提高前端代码健壮性">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/如何提高前端代码健壮性/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E8%84%9A%E6%89%8B%E6%9E%B6%E6%90%AD%E5%BB%BA/">脚手架搭建</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-01-29
-                            </span>
-                            
-                                <span id="/脚手架搭建/" class="leancloud_visitors" data-flag-title="脚手架搭建">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/脚手架搭建/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E6%9B%B4%E5%85%A8%E9%9D%A2%E7%9A%84axios%E5%B0%81%E8%A3%85/">更全面的axios封装</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2022-10-20
-                            </span>
-                            
-                                <span id="/更全面的axios封装/" class="leancloud_visitors" data-flag-title="更全面的axios封装">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/更全面的axios封装/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/tree-shaking%E8%AF%A6%E8%A7%A3/">tree-shaking详解</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2022-10-17
-                            </span>
-                            
-                                <span id="/tree-shaking详解/" class="leancloud_visitors" data-flag-title="tree-shaking详解">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/tree-shaking详解/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%85%B3%E4%BA%8Evue3%E6%88%91%E6%9C%89%E8%AF%9D%E6%83%B3%E8%AF%B4/">关于vue3我有话想说</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2022-09-22
-                            </span>
-                            
-                                <span id="/关于vue3我有话想说/" class="leancloud_visitors" data-flag-title="关于vue3我有话想说">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/关于vue3我有话想说/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
+                <div class="article-prev-next">
+                    
+                        <a href="/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96%E5%BC%80%E5%8F%91%E6%8E%A2%E7%B4%A2/" class="prev-prefix">« </a> 上一篇：    <a href="/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96%E5%BC%80%E5%8F%91%E6%8E%A2%E7%B4%A2/" title="发布于 2023-06-16 03:21">前端模块化开发探索</a>
+                        <br>
+                    
+                    
+                        <a href="/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%A0%81%E5%81%A5%E5%A3%AE%E6%80%A7/" class="next-prefix">» </a> 下一篇：    <a href="/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%A0%81%E5%81%A5%E5%A3%AE%E6%80%A7/" title="发布于 2023-06-16 03:01">如何提高前端代码健壮性</a>
+                    
+                </div>
             </div>
             
+    <div class="article-comments">
         
+            <div class="comments-title">
+                评论列表
+            </div>
+        
+        <div class="comments-content"></div>
+    </div>
+
+        </div>
     
 </div>
     <div id="footer"></div>
@@ -258,7 +146,7 @@
             <div class="menu-list">
                 <ul>
                     
-                        <li class=" active "><a href="/" class="" target="_self"><span class="iconfont icon-home-fill"></span>首页</a></li>
+                        <li class=""><a href="/" class="" target="_self"><span class="iconfont icon-home-fill"></span>首页</a></li>
                     
                         <li class=""><a href="/category" class="" target="_self"><span class="iconfont icon-folder-fill"></span>分类</a></li>
                     

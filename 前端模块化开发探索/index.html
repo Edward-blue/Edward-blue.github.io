@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-siteapp">
     <title>
         
-            edward
+            前端模块化开发探索
         
     </title>
     <link rel="shortcut icon" href="#"/>
@@ -31,208 +31,120 @@
 <meta name="generator" content="Hexo 6.0.0"></head>
 <body>
     <a id="cover"></a>
-    <link type="text/css" rel="stylesheet" href="/css/index.css">
-<div id="count"></div>
-<div id="header" >
+    <link type="text/css" rel="stylesheet" href="/css/post.css">
+<div id="header" class="header">
     <div class="vertical">
         <div class="inner">
             
-                <h1 class="header-title">edward</h1>
-                <h2 class="header-description" id="hitokoto"></h2>
-                <h3 class="header-info" id="hitokotoAuthor"></h3>
+                <h1 class="header-subtitle">前端模块化开发探索</h1>
+                <div class="header-subinfo">
+                    <p class="article-info-text">
+                        <span>
+                            <i class="iconfont icon-time"></i> 发表时间：2023-06-16
+                        </span>
+                        
+                            <span id="/前端模块化开发探索/" class="leancloud_visitors" data-flag-title="前端模块化开发探索">
+                                <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
+                            </span>
+                        
+                        <span>
+                            <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/前端模块化开发探索/"></span>
+                        </span>  
+                    </p>
+                    
+                    
+                </div>
             
         </div>
     </div>
     
-        <a class="scroll-down" href="javascript:;" target="_self" data-offset="-45">
-            <i class="scroll-down-icon iconfont icon-return"></i>
-        </a>
-    
 </div>
 <div id="container">
     
-        
-            <!-- 首页 -->
-            <div class="articles">
+        <!-- 文章页面 -->
+        <div id="article">
+            <div class="toc"></div>
+            <div class="article-body">
+                <blockquote>
+<p>本文旨在分享前端业务模块化开发的探索，鉴于本人知识水平所限，谬误在所难免，望各位不吝赐教…  </p>
+</blockquote>
+<h1 id="为什么需要模块化开发"><a href="#为什么需要模块化开发" class="headerlink" title="为什么需要模块化开发"></a>为什么需要模块化开发</h1><p>根据业务功能进行模块化一直以来都是后端的普遍做法，而Web前端则通常都是按照UI界面的视图区块View来进行模块化，这样的模块实际上只是Component组件，不具备独立自治的能力。然而在web生态高速发展的今天，浏览器越来越强大，赋能越来越多，前端从一个只负责数据渲染的瘦子，渐渐变成了一个大胖小子。这个时候我们需要回归一致的以业务为驱动的模块化视角。<br>从开发角度来说：我们需要高内聚、低耦合的松散结构体，而不是牵一发而动全身的巨石应用，这不管是对于开发、维护、还是后期渐进式重构，都至关重要。<br>从产品角度来说：软件架构永远是服务于业务需求的。我们希望我们的产品能像搭积木一样按需组合，可以快速包装出各种灵活多样的套餐，以满足客户越来越精细化的定制需求。<br>从工程的角度来说：模块化是跨工程、跨项目共享  </p>
+<h1 id="前端模块化开发探索"><a href="#前端模块化开发探索" class="headerlink" title="前端模块化开发探索"></a>前端模块化开发探索</h1><p>前端模块化开发是一种将代码分成小块、互相独立的模块来开发前端应用程序的方法。通过使用模块化开发，可以使得前端代码更易于维护、测试、扩展和重用。下面将探讨几种常见的前端模块化开发的方法。</p>
+<h2 id="CommonJS"><a href="#CommonJS" class="headerlink" title="CommonJS"></a>CommonJS</h2><p>CommonJS是一种用于服务器端JavaScript的模块化规范。该规范定义了如何在JavaScript中编写可重用、可组合的代码，并且能够在Node.js中使用。CommonJS的模块化方案是通过export和require两个全局对象来实现的。其中，export对象用于向外部暴露模块的接口，而require对象用于加载其他模块的接口。<br>以下是一个使用CommonJS模块化规范的示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// math.js</span><br><span class="line">exports.add = function(a, b) &#123;</span><br><span class="line">  return a + b;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// main.js</span><br><span class="line">const math = require(&#x27;./math&#x27;);</span><br><span class="line">console.log(math.add(1, 2)); // 3</span><br></pre></td></tr></table></figure>
+
+<h2 id="AMD"><a href="#AMD" class="headerlink" title="AMD"></a>AMD</h2><p>AMD（Asynchronous Module Definition，异步模块定义）是一种浏览器端JavaScript的模块化规范。它的主要特点是允许异步加载模块，从而提高页面的加载速度。AMD规范采用define函数来定义模块，并且使用require函数来加载模块。<br>以下是一个使用AMD模块化规范的示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// math.js</span><br><span class="line">define(function() &#123;</span><br><span class="line">  return &#123;</span><br><span class="line">    add: function(a, b) &#123;</span><br><span class="line">      return a + b;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// main.js</span><br><span class="line">require([&#x27;math&#x27;], function(math) &#123;</span><br><span class="line">  console.log(math.add(1, 2)); // 3</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="ES6-模块"><a href="#ES6-模块" class="headerlink" title="ES6 模块"></a>ES6 模块</h2><p>ES6 Modules是一种官方标准的JavaScript模块化方案。它允许将JavaScript代码分成独立的模块，并且支持静态分析、编译时优化和Tree Shaking等高级功能。ES6 Modules使用import和export语句来定义和加载模块。<br>以下是一个使用ES6 Modules的示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// math.js</span><br><span class="line">export function add(a, b) &#123;</span><br><span class="line">  return a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// main.js</span><br><span class="line">import &#123; add &#125; from &#x27;./math&#x27;;</span><br><span class="line">console.log(add(1, 2)); // 3</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>总结来说，CommonJS适用于服务器端JavaScript，AMD适用于浏览器端JavaScript，而ES6 Modules是未来的趋势，它在现代浏览器中得到广泛支持，也被Node.js支持。选择哪种模块化方案，应该根据项目的需求和特点来选择。  </p>
+</blockquote>
+<h1 id="前端划分模块的原则与边界"><a href="#前端划分模块的原则与边界" class="headerlink" title="前端划分模块的原则与边界"></a>前端划分模块的原则与边界</h1><ul>
+<li>拥有高内聚、低耦合的工程结构。</li>
+<li>拥有独立自治的子域逻辑。</li>
+<li>高内聚和低耦合是软件设计中常用的两个概念。<blockquote>
+<p>高内聚（High Cohesion）：指一个模块或组件内部的各个元素（如函数、属性等）之间紧密相关、协同工作，以实现模块或组件的某一特定功能。高内聚的模块或组件通常具有独立性、可重用性和易维护性，因为每个模块或组件只关注自己的任务，不与其他模块或组件产生过多的交互和依赖。<br>低耦合（Low Coupling）：指不同模块或组件之间的相互关联程度，也就是模块或组件之间的依赖程度。低耦合的模块或组件之间只有最小的相互依赖关系，彼此之间不会过度依赖或产生不必要的交互，从而提高了代码的可维护性和灵活性。</p>
+</blockquote>
+</li>
+</ul>
+<p>在软件设计中，高内聚和低耦合是非常重要的概念。一个好的设计应该追求高内聚和低耦合，以提高代码的可维护性、可重用性、可扩展性和灵活性。<br>首先我们看一下正常的项目目录</p>
+<p>├─ src<br>│  ├─ api                 # API接口管理<br>│  ├─ assets              # 静态资源文件<br>│  ├─ components          # 全局组件<br>│  ├─ config              # 全局配置项<br>│  ├─ enums               # 项目枚举<br>│  ├─ hooks               # 常用 Hooks<br>│  ├─ language            # 语言国际化<br>│  ├─ layout              # 框架布局<br>│  ├─ routers             # 路由管理<br>│  ├─ store               # store<br>│  ├─ styles              # 全局样式<br>│  ├─ typings             # 全局 ts 声明<br>│  ├─ utils               # 工具库<br>│  ├─ views               # 项目所有页面<br>│  ├─ App.vue             # 入口页面<br>│  └─ main.js             # 入口文件</p>
+<p>再看一下改进的文件目录</p>
+<p>src<br>├── modules<br>│      ├──  ModuleA<br>│      │     ├── entities<br>│      │     ├── assets<br>│      │     ├── api<br>│      │     ├── utils<br>│      │     ├── language<br>│      │     ├── components<br>│      │     ├── views<br>│      │     ├── model.js<br>│      │     └── index.js<br>│      │<br>│      ├── ModuleB<br>│      ├── ModuleC<br>模块化是一种将代码分解成独立的、可重用的、可维护的小块的方法。在实践中，有几个原则和边界需要遵守，以确保模块化的有效性和可维护性。每个微模块负责定义和维护自己领域内的事务，拥有独立状态管理、数据模型、控制器、视图、组件、资源、业务实体、API管理等等…总之，所有与自己模块相关的资源都被内聚到了一起。</p>
+<h3 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h3><h4 id="单一职责原则"><a href="#单一职责原则" class="headerlink" title="单一职责原则"></a>单一职责原则</h4><p>单一职责原则（Single Responsibility Principle，SRP）是指一个模块应该只有一个职责。这意味着模块应该只做一件事情，并且将其做好。如果模块做了太多的事情，那么它将变得难以维护和理解。</p>
+<h4 id="开放封闭原则"><a href="#开放封闭原则" class="headerlink" title="开放封闭原则"></a>开放封闭原则</h4><p>开放封闭原则（open-closed Principle，OCP）是指一个模块应该对扩展开放，对修改关闭。这意味着模块的行为应该能够扩展，但不应该修改现有的行为。如果模块需要进行修改，那么可能需要重构代码。</p>
+<h4 id="接口隔离原则"><a href="#接口隔离原则" class="headerlink" title="接口隔离原则"></a>接口隔离原则</h4><p>接口隔离原则（Interface Segregation Principle，ISP）是指一个模块应该只暴露必要的接口。这意味着模块应该只提供必要的方法和属性，而不是暴露整个实现细节。这样做可以减少模块之间的耦合度，从而提高代码的可维护性。</p>
+<h4 id="依赖反转原则"><a href="#依赖反转原则" class="headerlink" title="依赖反转原则"></a>依赖反转原则</h4><p>依赖反转原则（Dependency Inversion Principle，DIP）是指模块之间的依赖关系应该是抽象的。这意味着一个模块应该依赖于抽象而不是具体的实现细节。这样做可以减少模块之间的耦合度，从而提高代码的可维护性。</p>
+<h3 id="边界"><a href="#边界" class="headerlink" title="边界"></a>边界</h3><h4 id="模块接口"><a href="#模块接口" class="headerlink" title="模块接口"></a>模块接口</h4><p>模块接口是指一个模块向外部暴露的方法和属性。模块接口应该是清晰、简单、易于理解的。如果一个模块接口过于复杂，那么使用该模块的开发人员可能会感到困惑。</p>
+<h4 id="模块依赖"><a href="#模块依赖" class="headerlink" title="模块依赖"></a>模块依赖</h4><p>模块依赖是指一个模块依赖于其他模块的接口。如果一个模块依赖的模块过多，那么该模块可能会变得难以维护。</p>
+<h4 id="模块划分"><a href="#模块划分" class="headerlink" title="模块划分"></a>模块划分</h4><p>模块划分是指如何将代码分解成模块。模块划分应该是基于单一职责原则，将代码分解成独立、可重用、可维护的小块。如果模块划分</p>
+<h3 id="模块化开发的具体实现"><a href="#模块化开发的具体实现" class="headerlink" title="模块化开发的具体实现"></a>模块化开发的具体实现</h3><p>根据其不同的业务领域按照模块化结构进行拆分<br>将各资源按照模块的主题领域内聚在一起<br>拆解不同模块的view文件，防止耦合<br>模块内部资源不可随意调用，需建立导出</p>
+
                 
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96%E5%BC%80%E5%8F%91%E6%8E%A2%E7%B4%A2/">前端模块化开发探索</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-06-16
-                            </span>
-                            
-                                <span id="/前端模块化开发探索/" class="leancloud_visitors" data-flag-title="前端模块化开发探索">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/前端模块化开发探索/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
+                <p class="end">__END__</p>
+            </div>
+            <div class="article-footer">
+                <div class="suffix-box">
+    <div class="suffix-box-left">
+        <img src="/image/sidebar/avatar.jpg" alt="edward">
+    </div>
+    <div class="suffix-box-right">
+        <span class="suffix-box-title">文章作者：</span>edward
+        <br>
+        <span class="suffix-box-title">文章出处：</span><a href="/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96%E5%BC%80%E5%8F%91%E6%8E%A2%E7%B4%A2/" target="_blank">前端模块化开发探索</a>
+        <br>
+        <span class="suffix-box-title">作者签名：</span>迷途漫漫终有一归
+        <br>
+        <span class="suffix-box-title">关于主题：</span><a href="https://github.com/first19326/Hexo-LiveForCode" target="_blank">Hexo - Live For Code</a>
+        <br>
+        <span class="suffix-box-title">版权声明：</span>文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="BY-NC-SA" target="_blank">BY-NC-SA</a> 许可协议，转载请注明出处
+        <br>
+    </div>
+    <div style="clear: both;"></div>
+</div>
                 
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%89%8D%E7%AB%AF%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/">前端奇技淫巧</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-06-16
-                            </span>
-                            
-                                <span id="/前端奇技淫巧/" class="leancloud_visitors" data-flag-title="前端奇技淫巧">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/前端奇技淫巧/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
                 
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%A0%81%E5%81%A5%E5%A3%AE%E6%80%A7/">如何提高前端代码健壮性</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-06-16
-                            </span>
-                            
-                                <span id="/如何提高前端代码健壮性/" class="leancloud_visitors" data-flag-title="如何提高前端代码健壮性">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/如何提高前端代码健壮性/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E8%84%9A%E6%89%8B%E6%9E%B6%E6%90%AD%E5%BB%BA/">脚手架搭建</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2023-01-29
-                            </span>
-                            
-                                <span id="/脚手架搭建/" class="leancloud_visitors" data-flag-title="脚手架搭建">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/脚手架搭建/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E6%9B%B4%E5%85%A8%E9%9D%A2%E7%9A%84axios%E5%B0%81%E8%A3%85/">更全面的axios封装</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2022-10-20
-                            </span>
-                            
-                                <span id="/更全面的axios封装/" class="leancloud_visitors" data-flag-title="更全面的axios封装">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/更全面的axios封装/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/tree-shaking%E8%AF%A6%E8%A7%A3/">tree-shaking详解</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2022-10-17
-                            </span>
-                            
-                                <span id="/tree-shaking详解/" class="leancloud_visitors" data-flag-title="tree-shaking详解">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/tree-shaking详解/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
-                    <div class="article">
-                        <div class="article-title">
-                            <a href="/%E5%85%B3%E4%BA%8Evue3%E6%88%91%E6%9C%89%E8%AF%9D%E6%83%B3%E8%AF%B4/">关于vue3我有话想说</a>
-                            
-                        </div>
-                        <div class="article-abstract">
-                            
-                        </div>
-                        <div class="clear"></div>
-                        <div class="article-info">
-                            <span>
-                                <i class="iconfont icon-time"></i> 发表时间：2022-09-22
-                            </span>
-                            
-                                <span id="/关于vue3我有话想说/" class="leancloud_visitors" data-flag-title="关于vue3我有话想说">
-                                    <i class="iconfont icon-browse"></i> 阅读：<sapn class="leancloud-visitors-count"></span>
-                                </span>
-                            
-                            <span>
-                                <i class="iconfont icon-interactive"></i> 评论：<span class="valine-comment-count" data-xid="/关于vue3我有话想说/"></span>
-                            </span>
-                        </div>
-                        <div class="clear"></div>     
-                    </div>
-                
+                <div class="article-prev-next">
+                    
+                    
+                        <a href="/%E5%89%8D%E7%AB%AF%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" class="next-prefix">» </a> 下一篇：    <a href="/%E5%89%8D%E7%AB%AF%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" title="发布于 2023-06-16 03:12">前端奇技淫巧</a>
+                    
+                </div>
             </div>
             
+    <div class="article-comments">
         
+            <div class="comments-title">
+                评论列表
+            </div>
+        
+        <div class="comments-content"></div>
+    </div>
+
+        </div>
     
 </div>
     <div id="footer"></div>
@@ -258,7 +170,7 @@
             <div class="menu-list">
                 <ul>
                     
-                        <li class=" active "><a href="/" class="" target="_self"><span class="iconfont icon-home-fill"></span>首页</a></li>
+                        <li class=""><a href="/" class="" target="_self"><span class="iconfont icon-home-fill"></span>首页</a></li>
                     
                         <li class=""><a href="/category" class="" target="_self"><span class="iconfont icon-folder-fill"></span>分类</a></li>
                     
